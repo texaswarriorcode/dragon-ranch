@@ -14,6 +14,12 @@ dist/
 *.log
 npm-debug.log*
 
+# Playwright / caches
+playwright-report/
+test-results/
+.playwright/
+blob-report/
+
 # Screenshots kept in repo for verification — do not ignore
 # screenshots/
 
