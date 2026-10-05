@@ -2,6 +2,10 @@
 
 A low-poly 3D farming & dragon-ranching browser game built with **Three.js** + **Vite**. All models are procedural primitives — no external runtime asset downloads.
 
+**Play it live:** [texaswarriorcode.github.io/dragon-ranch](https://texaswarriorcode.github.io/dragon-ranch/)
+
+Progress saves in your browser, so it only carries over on the same device and browser.
+
 ## How to run
 
 ```bash
