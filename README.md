@@ -59,6 +59,14 @@ Open with **M** or the **Marketplace** button. Tabs: Farm Plots, Dragons, Dragon
 
 Catalog data lives in `src/marketplace/catalog.js` (`MARKETPLACE_CATALOG`). Purchase stub: `tryPurchase()` in `src/marketplace/marketplace.js` (returns “Not for sale yet” until real assets are added). Coins display is a placeholder (starts at 0).
 
+## Dragon stats
+
+Common L1 base: **HP 100 / Def 5 / Atk 10**. Each rarity compounds **+10%** on the previous (1 decimal), except **Epic** (×2 Super Rare) and **Legendary** (×2 Exceptional). Levels add bonuses from the common base (+5% per level, +10% on ×10, +50% on ×50). Final = rarity base + level bonus. See `src/config.js` (`DRAGON_STATS`) and `src/stats.js`.
+
+```bash
+npm run test:stats
+```
+
 ## Creative mode
 
 Toggle **Creative** in the help panel for unlimited buildings and a spawn grid of any sex / age / rarity.

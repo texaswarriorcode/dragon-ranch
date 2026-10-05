@@ -63,6 +63,26 @@ export const DRAGONS = {
 };
 
 /**
+ * Combat/farming stats for dragons.
+ * rarityBase = Common L1 scaled by rarity rules (see src/stats.js).
+ * levelBonus = cumulative increments of BASE for levels 2..L.
+ * final = rarityBase + levelBonus.
+ */
+export const DRAGON_STATS = {
+  base: { hp: 100, defense: 5, attack: 10 },
+  /** Normal step between rarities (compounding). */
+  rarityStepMult: 1.1,
+  /** Tiers that double the previous tier instead of +10%. */
+  rarityDoubleTiers: ['Epic', 'Legendary'],
+  levelUp: {
+    normal: 0.05,   // +5% of base each level
+    every10: 0.1,   // +10% of base on levels divisible by 10
+    every50: 0.5,   // +50% of base on levels divisible by 50
+  },
+};
+
+
+/**
  * Rarity tiers (ascending). Upgrade only when BOTH parents share the same
  * tier N and the roll succeeds — baby becomes N+1. Otherwise baby is the
  * lower of the two parent tiers. Two Legendaries always stay Legendary.

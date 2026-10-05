@@ -1,5 +1,6 @@
 import { DRAGONS, RARITY, PLAYER } from './config.js';
 import { rarityCss } from './rarity.js';
+import { computeDragonStats, formatStatsLine } from './stats.js';
 import { MARKETPLACE_TABS, MARKETPLACE_CATALOG } from './marketplace/catalog.js';
 import { tryPurchase } from './marketplace/marketplace.js';
 
@@ -147,7 +148,23 @@ export class UI {
   }
 
   _buildCreativeSpawn() {
+    this.creativeLevel = this.creativeLevel || 1;
     this.spawnRow.innerHTML = '';
+    const lvlRow = document.createElement('div');
+    lvlRow.className = 'btn-row';
+    lvlRow.style.marginBottom = '6px';
+    lvlRow.innerHTML = '<span style="font-size:11px;opacity:0.8;margin-right:6px">Spawn level:</span>';
+    for (const lv of [1, 10, 25, 50]) {
+      const b = document.createElement('button');
+      b.className = 'ui-btn spawn-btn' + (this.creativeLevel === lv ? ' active' : '');
+      b.textContent = `L${lv}`;
+      b.addEventListener('click', () => {
+        this.creativeLevel = lv;
+        this._buildCreativeSpawn();
+      });
+      lvlRow.appendChild(b);
+    }
+    this.spawnRow.appendChild(lvlRow);
     for (const tier of RARITY.tiers) {
       for (const sex of ['male', 'female']) {
         for (const stage of [0, 2]) {
@@ -157,7 +174,7 @@ export class UI {
           const age = stage === 2 ? 'Adult' : 'Baby';
           btn.textContent = `${sex === 'male' ? '♂' : '♀'} ${age} ${tier}`;
           btn.addEventListener('click', () => {
-            this.onCreativeSpawn?.({ sex, stage, rarity: tier });
+            this.onCreativeSpawn?.({ sex, stage, rarity: tier, level: this.creativeLevel || 1 });
           });
           this.spawnRow.appendChild(btn);
         }
@@ -194,9 +211,12 @@ export class UI {
       const el = document.createElement('button');
       el.className = 'dragon-item' + (d.id === selectedId ? ' selected' : '');
       const stage = DRAGONS.stages[d.stage]?.name || 'baby';
+      const stats = computeDragonStats(d.rarity || 'Common', d.level ?? 1);
       el.innerHTML = `
         <span class="rarity-pip" style="background:${rarityCss(d.rarity)}"></span>
-        <span class="di-main">${d.sex === 'male' ? '♂' : '♀'} ${stage}</span>
+        <span class="di-main">${d.sex === 'male' ? '♂' : '♀'} ${stage}
+          <span class="di-stats">${formatStatsLine(stats)}</span>
+        </span>
         <span class="di-rarity" style="color:${rarityCss(d.rarity)}">${d.rarity}</span>
       `;
       el.addEventListener('click', () => {
@@ -300,7 +320,8 @@ export class UI {
     const sex = dragon.sex === 'male' ? 'Male ♂' : 'Female ♀';
     const rarity = dragon.rarity || 'Common';
     const col = rarityCss(rarity);
-    return `<b>Red Dragon</b> — ${sex}<br>Stage: ${stage}<br><span style="color:${col}">★ ${rarity}</span>`;
+    const stats = computeDragonStats(rarity, dragon.level ?? 1);
+    return `<b>Red Dragon</b> — ${sex}<br>Stage: ${stage}<br><span style="color:${col}">★ ${rarity}</span><br>${formatStatsLine(stats)}`;
   }
 
 

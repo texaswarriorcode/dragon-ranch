@@ -5,8 +5,14 @@ export function nextInvId() {
   return _id++;
 }
 
-export function makeDragonItem({ sex, stage = 0, rarity = 'Common', id = null }) {
-  return { id: id ?? nextInvId(), sex, stage, rarity };
+export function makeDragonItem({ sex, stage = 0, rarity = 'Common', level = 1, id = null }) {
+  return {
+    id: id ?? nextInvId(),
+    sex,
+    stage,
+    rarity,
+    level: Math.max(1, Math.floor(level) || 1),
+  };
 }
 
 export function defaultInventory() {
@@ -47,6 +53,7 @@ export function migrateInventory(raw) {
         sex: d.sex,
         stage: d.stage ?? 0,
         rarity: d.rarity || 'Common',
+        level: d.level ?? 1,
         id: d.id,
       })
     );

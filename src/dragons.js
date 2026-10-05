@@ -196,6 +196,7 @@ export class DragonManager {
     const sex = opts.sex;
     const stage = opts.stage ?? 0;
     const rarity = normalizeRarity(opts.rarity || 'Common');
+    const level = Math.max(1, Math.floor(opts.level) || 1);
     const isBreed = pen.type === 'breedingPen';
     const max = isBreed ? BUILDINGS.breedingPen.maxDragons : BUILDINGS.dragonPen.maxDragons;
 
@@ -221,6 +222,7 @@ export class DragonManager {
       penId: pen.id,
       penType: pen.type,
       rarity,
+      level,
       mesh,
       x,
       z,
@@ -239,6 +241,7 @@ export class DragonManager {
       sex: dragon.sex,
       stage: dragon.stage,
       rarity: normalizeRarity(dragon.rarity),
+      level: dragon.level ?? 1,
     };
     this.scene.remove(dragon.mesh);
     this.dragons = this.dragons.filter((d) => d.id !== dragon.id);
@@ -455,6 +458,7 @@ export class DragonManager {
         penId: d.penId,
         penType: d.penType,
         rarity: normalizeRarity(d.rarity),
+        level: d.level ?? 1,
         x: d.x,
         z: d.z,
       })),
@@ -502,6 +506,7 @@ export class DragonManager {
         penId: raw.penId,
         penType: raw.penType || 'dragonPen',
         rarity,
+        level: raw.level ?? 1,
         mesh,
         x: raw.x,
         z: raw.z,

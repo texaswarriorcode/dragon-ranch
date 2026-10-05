@@ -186,7 +186,7 @@ export class Game {
     }
 
     // Legendary adult in inventory for panel screenshots
-    this.inventory.dragons.push(makeDragonItem({ sex: 'male', stage: 2, rarity: 'Legendary' }));
+    this.inventory.dragons.push(makeDragonItem({ sex: 'male', stage: 2, rarity: 'Legendary', level: 50 }));
     this.inventory.dragons.push(makeDragonItem({ sex: 'female', stage: 2, rarity: 'Exceptional' }));
     this.inventory.dragons.push(makeDragonItem({ sex: 'male', stage: 0, rarity: 'Rare' }));
     this.selectedDragonId = this.inventory.dragons[0]?.id;
@@ -383,7 +383,7 @@ export class Game {
         this.ui.toast(`An egg was laid! (${egg.rarity})`);
       },
       (egg) => {
-        const item = makeDragonItem({ sex: egg.sex, stage: 0, rarity: egg.rarity });
+        const item = makeDragonItem({ sex: egg.sex, stage: 0, rarity: egg.rarity, level: 1 });
         this._addDragonItem(item);
         const flair = egg.upgraded;
         const msg = egg.upgraded
@@ -570,7 +570,7 @@ export class Game {
                 const egg = this.dragons.hatchEgg(bp.id, now, true);
                 if (egg) {
                   st.cooldownUntil = now + BREEDING.cooldownMs;
-                  const item = makeDragonItem({ sex: egg.sex, stage: 0, rarity: egg.rarity });
+                  const item = makeDragonItem({ sex: egg.sex, stage: 0, rarity: egg.rarity, level: 1 });
                   this._addDragonItem(item);
                   const flair = egg.upgraded;
                   this.ui.toast(
