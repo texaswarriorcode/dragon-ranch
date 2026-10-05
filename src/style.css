@@ -510,3 +510,26 @@ button.ui-btn.active { outline: 2px solid #9fe070; }
 .spawn-btn.active {
   outline: 2px solid #9fe070;
 }
+
+.xp-bar {
+  display: block;
+  height: 5px;
+  background: rgba(0,0,0,0.45);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 3px;
+  max-width: 160px;
+}
+.xp-bar > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #42a5f5, #66bb6a);
+  width: 0%;
+}
+.xp-bar.tip {
+  margin-top: 6px;
+  max-width: 180px;
+}
+.hotbar .slot {
+  width: 58px;
+}

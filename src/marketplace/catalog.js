@@ -1,19 +1,9 @@
 /**
- * Marketplace catalog — extension point for future buyable assets.
+ * Marketplace catalog — extension point for buyable assets.
  *
- * Each category is an array of listing objects:
- *   {
- *     id: string,
- *     name: string,
- *     description: string,
- *     price: number,          // coins (currency wired later)
- *     rarity?: string,        // optional; dragons etc.
- *     unlocked?: boolean,     // optional gate
- *     comingSoon?: boolean,   // grayed placeholder card
- *   }
- *
- * Add real listings here later; the UI reads MARKETPLACE_CATALOG directly.
- * Purchase flow goes through tryPurchase() in ./marketplace.js.
+ * Listing shape:
+ *   { id, name, description, price, rarity?, unlocked?, comingSoon?,
+ *     grant?: { kind: 'building'|'worker', key: string, count?: number } }
  */
 
 /** @typedef {'farmPlots'|'dragons'|'dragonBuildings'|'farmWorkers'|'farmBuildings'} MarketCategory */
@@ -27,48 +17,52 @@ export const MARKETPLACE_TABS = [
   { id: 'farmBuildings', label: 'Farm Buildings' },
 ];
 
-/** Coming-soon silhouette stubs so empty tabs still show layout. */
-function stubs(prefix) {
-  return [
-    {
-      id: `${prefix}-soon-1`,
-      name: 'Coming soon',
-      description: 'Asset placeholder — not for sale yet.',
-      price: 0,
-      comingSoon: true,
-    },
-    {
-      id: `${prefix}-soon-2`,
-      name: 'Coming soon',
-      description: 'Asset placeholder — not for sale yet.',
-      price: 0,
-      comingSoon: true,
-    },
-    {
-      id: `${prefix}-soon-3`,
-      name: 'Coming soon',
-      description: 'Asset placeholder — not for sale yet.',
-      price: 0,
-      comingSoon: true,
-    },
-  ];
+function stubs(prefix, n = 2) {
+  return Array.from({ length: n }, (_, i) => ({
+    id: `${prefix}-soon-${i + 1}`,
+    name: 'Coming soon',
+    description: 'Asset placeholder — not for sale yet.',
+    price: 0,
+    comingSoon: true,
+  }));
 }
 
-/**
- * Live catalog. Start empty of real items; stubs are display-only.
- * To add a real listing later, push an object WITHOUT comingSoon:true
- * into the appropriate array (and implement tryPurchase).
- */
 export const MARKETPLACE_CATALOG = {
   farmPlots: [...stubs('farmPlots')],
   dragons: [...stubs('dragons')],
   dragonBuildings: [...stubs('dragonBuildings')],
-  farmWorkers: [...stubs('farmWorkers')],
-  farmBuildings: [...stubs('farmBuildings')],
+  farmWorkers: [
+    {
+      id: 'worker-dragon-handler',
+      name: 'Dragon Handler',
+      description:
+        'Cares for your dragons — tends pens and helps them gain experience. Requires a free bunk in a Worker Bunkhouse.',
+      price: 50,
+      grant: { kind: 'worker', key: 'dragonHandler' },
+    },
+    ...stubs('farmWorkers', 2),
+  ],
+  farmBuildings: [
+    {
+      id: 'bld-worker-bunkhouse',
+      name: 'Worker Bunkhouse',
+      description: 'Long bunkhouse (4×10) with beds for 4 farm workers. Place with the build hotbar after purchase.',
+      price: 75,
+      grant: { kind: 'building', key: 'workerBunkhouses', count: 1 },
+    },
+    ...stubs('farmBuildings', 2),
+  ],
 };
 
-/** Real (non-stub) listings only — useful when filtering later. */
 export function getActiveListings(category) {
   const list = MARKETPLACE_CATALOG[category] || [];
   return list.filter((l) => !l.comingSoon);
+}
+
+export function findListingById(id) {
+  for (const cat of Object.keys(MARKETPLACE_CATALOG)) {
+    const hit = MARKETPLACE_CATALOG[cat].find((l) => l.id === id);
+    if (hit) return { listing: hit, category: cat };
+  }
+  return null;
 }

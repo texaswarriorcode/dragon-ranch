@@ -427,12 +427,121 @@ export function createBreedingPen() {
   return g;
 }
 
+
+/** Worker bunkhouse — 4×10 footprint (rotate for 10×4). Capacity 4. */
+export function createWorkerBunkhouse() {
+  const g = new THREE.Group();
+  g.name = 'workerBunkhouse';
+  const w = BUILDINGS.workerBunkhouse.w;
+  const d = BUILDINGS.workerBunkhouse.d;
+
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0xc4a484, roughness: 0.8 });
+  const roofMat = new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 0.85, flatShading: true });
+  const woodMat = new THREE.MeshStandardMaterial({ color: 0x6d4c41 });
+  const bedMat = new THREE.MeshStandardMaterial({ color: 0x90caf9 });
+
+  const wallH = 2.2;
+  const thick = 0.22;
+
+  // Floor
+  const floor = new THREE.Mesh(
+    new THREE.BoxGeometry(w - 0.1, 0.1, d - 0.1),
+    new THREE.MeshStandardMaterial({ color: 0x8d6e63 })
+  );
+  floor.position.set(w / 2, 0.05, d / 2);
+  floor.receiveShadow = true;
+  g.add(floor);
+
+  // Long walls (east/west) and short ends
+  const longL = new THREE.Mesh(new THREE.BoxGeometry(thick, wallH, d), wallMat);
+  longL.position.set(thick / 2, wallH / 2, d / 2);
+  setShadow(longL);
+  g.add(longL);
+  const longR = longL.clone();
+  longR.position.x = w - thick / 2;
+  g.add(longR);
+
+  // North end full
+  const north = new THREE.Mesh(new THREE.BoxGeometry(w, wallH, thick), wallMat);
+  north.position.set(w / 2, wallH / 2, d - thick / 2);
+  setShadow(north);
+  g.add(north);
+
+  // South with door
+  const doorW = 1.1;
+  const sideW = (w - doorW) / 2;
+  const swL = new THREE.Mesh(new THREE.BoxGeometry(sideW, wallH, thick), wallMat);
+  swL.position.set(sideW / 2, wallH / 2, thick / 2);
+  setShadow(swL);
+  g.add(swL);
+  const swR = new THREE.Mesh(new THREE.BoxGeometry(sideW, wallH, thick), wallMat);
+  swR.position.set(w - sideW / 2, wallH / 2, thick / 2);
+  setShadow(swR);
+  g.add(swR);
+  const door = new THREE.Mesh(new THREE.BoxGeometry(doorW * 0.9, 1.7, 0.08), woodMat);
+  door.position.set(w / 2, 0.85, thick / 2 + 0.04);
+  g.add(door);
+
+  // Pitched roof along length (ridge on X, slopes on Z... actually long building: ridge along Z)
+  const ridgeH = wallH + 0.9;
+  const overhang = 0.25;
+  const makeSlab = (z0, z1) => {
+    const A = [-overhang, wallH, z0];
+    const B = [w + overhang, wallH, z0];
+    const C = [w + overhang, ridgeH, (z0 + z1) / 2];
+    // simpler: two boxes
+  };
+  void makeSlab;
+  const slopeLen = Math.hypot(w / 2 + overhang, ridgeH - wallH);
+  const pitch = Math.atan2(ridgeH - wallH, w / 2 + overhang);
+  const midY = (wallH + ridgeH) / 2;
+  const roofL = new THREE.Mesh(new THREE.BoxGeometry(slopeLen, 0.12, d + overhang * 2), roofMat);
+  roofL.position.set(w / 4, midY, d / 2);
+  roofL.rotation.z = pitch;
+  setShadow(roofL);
+  g.add(roofL);
+  const roofR = new THREE.Mesh(new THREE.BoxGeometry(slopeLen, 0.12, d + overhang * 2), roofMat);
+  roofR.position.set((3 * w) / 4, midY, d / 2);
+  roofR.rotation.z = -pitch;
+  setShadow(roofR);
+  g.add(roofR);
+
+  // 4 bunks along the length (visible through "windows")
+  for (let i = 0; i < 4; i++) {
+    const bz = 1.5 + i * ((d - 2.5) / 3);
+    const bed = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.35, 0.7), bedMat);
+    bed.position.set(w / 2, 0.4, bz);
+    g.add(bed);
+    const pillow = new THREE.Mesh(
+      new THREE.BoxGeometry(0.35, 0.15, 0.5),
+      new THREE.MeshStandardMaterial({ color: 0xfffde7 })
+    );
+    pillow.position.set(w / 2 - 0.4, 0.62, bz);
+    g.add(pillow);
+    // Window on long wall
+    const win = new THREE.Mesh(
+      new THREE.BoxGeometry(0.08, 0.55, 0.7),
+      new THREE.MeshStandardMaterial({ color: 0x81d4fa, emissive: 0x224466, emissiveIntensity: 0.25 })
+    );
+    win.position.set(w - thick / 2 - 0.01, 1.3, bz);
+    g.add(win);
+  }
+
+  // Sign
+  const sign = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.5, 0.08), woodMat);
+  sign.position.set(w / 2, 2.0, -0.15);
+  g.add(sign);
+
+  return g;
+}
+
 export function createBuildingMesh(type) {
   switch (type) {
     case 'farmhouse': return createFarmhouse();
     case 'farmPlot': return createFarmPlot();
     case 'dragonPen': return createDragonPen();
     case 'breedingPen': return createBreedingPen();
+    case 'workerBunkhouse': return createWorkerBunkhouse();
     default: throw new Error('Unknown building ' + type);
   }
 }
@@ -615,6 +724,16 @@ export class BuildingManager {
   findAnyPenAt(tx, tz) {
     const b = this.findAt(tx, tz);
     return b && (b.type === 'dragonPen' || b.type === 'breedingPen') ? b : null;
+  }
+
+  bunkCapacity() {
+    return this.buildings
+      .filter((b) => b.type === 'workerBunkhouse')
+      .reduce((n, b) => n + (BUILDINGS.workerBunkhouse.capacity || 4), 0);
+  }
+
+  findBunkhouses() {
+    return this.buildings.filter((b) => b.type === 'workerBunkhouse');
   }
 
   findFarmhouseNear(x, z, radius = 5) {

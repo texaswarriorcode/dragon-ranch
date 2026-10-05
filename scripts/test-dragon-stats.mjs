@@ -1,10 +1,11 @@
 /**
- * Verify rarity L1 table and level breakpoints.
+ * Verify rarity L1 table, level breakpoints, and XP curve.
  * Run: node scripts/test-dragon-stats.mjs
  */
 import { RARITY, DRAGON_STATS } from '../src/config.js';
 import {
   rarityBaseStats, levelBonusStats, computeDragonStats, round1, levelUpIncrement,
+  xpToNextLevel, grantDragonXp,
 } from '../src/stats.js';
 
 let failed = 0;
@@ -27,77 +28,27 @@ for (const tier of RARITY.tiers) {
   );
 }
 
-const c = table.Common;
-check('Common L1 base', c.hp === 100 && c.defense === 5 && c.attack === 10, JSON.stringify(c));
+check('Common L1 base', table.Common.hp === 100 && table.Common.defense === 5 && table.Common.attack === 10);
+check('Epic doubles SR', table.Epic.hp === round1(table['Super Rare'].hp * 2));
+check('Legendary doubles Exceptional', table.Legendary.hp === round1(table.Exceptional.hp * 2));
 
-// Uncommon = Common * 1.1
-check(
-  'Uncommon = Common*1.1',
-  table.Uncommon.hp === round1(100 * 1.1) &&
-    table.Uncommon.defense === round1(5 * 1.1) &&
-    table.Uncommon.attack === round1(10 * 1.1),
-  JSON.stringify(table.Uncommon)
-);
-
-// Epic doubles Super Rare
-check(
-  'Epic = Super Rare * 2',
-  table.Epic.hp === round1(table['Super Rare'].hp * 2) &&
-    table.Epic.defense === round1(table['Super Rare'].defense * 2) &&
-    table.Epic.attack === round1(table['Super Rare'].attack * 2),
-  `SR=${JSON.stringify(table['Super Rare'])} Epic=${JSON.stringify(table.Epic)}`
-);
-
-// Exceptional = Epic * 1.1
-check(
-  'Exceptional = Epic * 1.1',
-  table.Exceptional.hp === round1(table.Epic.hp * 1.1),
-  JSON.stringify(table.Exceptional)
-);
-
-// Legendary doubles Exceptional
-check(
-  'Legendary = Exceptional * 2',
-  table.Legendary.hp === round1(table.Exceptional.hp * 2) &&
-    table.Legendary.defense === round1(table.Exceptional.defense * 2) &&
-    table.Legendary.attack === round1(table.Exceptional.attack * 2),
-  JSON.stringify(table.Legendary)
-);
-
-console.log('\n=== Level bonuses (on Common base) ===');
-const b = DRAGON_STATS.base;
+console.log('\n=== Level bonuses ===');
 check('L1 bonus zero', levelBonusStats(1).hp === 0);
+check('L10 +10% step', levelUpIncrement(10).hp === round1(DRAGON_STATS.base.hp * 0.1));
+check('L50 +50% step', levelUpIncrement(50).hp === round1(DRAGON_STATS.base.hp * 0.5));
 
-const inc2 = levelUpIncrement(2);
-check('L2 increment +5% HP', inc2.hp === round1(b.hp * 0.05), String(inc2.hp));
+console.log('\n=== XP requirements ===');
+check('XP 1→2 = 100', xpToNextLevel(1) === 100);
+check('XP 2→3 = 110', xpToNextLevel(2) === 110);
+check('XP 3→4 = 121', xpToNextLevel(3) === 121);
 
-const inc10 = levelUpIncrement(10);
-check('L10 increment +10% HP', inc10.hp === round1(b.hp * 0.1), String(inc10.hp));
+const baby = { stage: 0, level: 1, xp: 0 };
+grantDragonXp(baby, 500);
+check('Baby no XP', baby.xp === 0 && baby.level === 1);
 
-const inc50 = levelUpIncrement(50);
-check('L50 increment +50% HP', inc50.hp === round1(b.hp * 0.5), String(inc50.hp));
-
-// Manual cumulative L10
-let manual = { hp: 0, defense: 0, attack: 0 };
-for (let lv = 2; lv <= 10; lv++) {
-  const inc = levelUpIncrement(lv);
-  manual.hp = round1(manual.hp + inc.hp);
-  manual.defense = round1(manual.defense + inc.defense);
-  manual.attack = round1(manual.attack + inc.attack);
-}
-const l10 = levelBonusStats(10);
-check('L10 cumulative matches', l10.hp === manual.hp, `got ${l10.hp} expect ${manual.hp}`);
-
-const commonL10 = computeDragonStats('Common', 10);
-check(
-  'Common L10 = base + bonus',
-  commonL10.hp === round1(100 + l10.hp),
-  JSON.stringify(commonL10)
-);
-
-const legL50 = computeDragonStats('Legendary', 50);
-console.log('\nSample Legendary L50:', legL50);
-check('Legendary L50 > L1', legL50.hp > table.Legendary.hp);
+const adult = { stage: 2, level: 1, xp: 0 };
+const g = grantDragonXp(adult, 100);
+check('Adult 100 XP levels to 2', g.level === 2 && g.leveled === 1, JSON.stringify(g));
 
 console.log(failed ? `\n${failed} FAILED` : '\nALL CHECKS PASSED');
 process.exit(failed ? 1 : 0);

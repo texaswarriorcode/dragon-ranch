@@ -35,6 +35,8 @@ export const BUILDINGS = {
   farmPlot: { w: 4, d: 4, label: 'Farm Plot', color: 0x6b4423 },
   dragonPen: { w: 8, d: 8, label: 'Dragon Pen', color: 0x8b7355, maxDragons: 4 },
   breedingPen: { w: 8, d: 8, label: 'Breeding Pen', color: 0x9b59b6, maxDragons: 2 },
+  /** Footprint 4 wide × 10 long; R rotates to 10×4. */
+  workerBunkhouse: { w: 4, d: 10, label: 'Worker Bunkhouse', color: 0x8d6e63, capacity: 4 },
 };
 
 /** Crop growth in milliseconds (demo-tuned ~2–3 min to mature). */
@@ -79,7 +81,37 @@ export const DRAGON_STATS = {
     every10: 0.1,   // +10% of base on levels divisible by 10
     every50: 0.5,   // +50% of base on levels divisible by 50
   },
+  xp: {
+    /** XP required to go from level 1 → 2. */
+    baseToLevel2: 100,
+    /** Each further level needs prior requirement × this (compounding). */
+    levelReqMult: 1.1,
+    maxLevel: 100,
+    /** Feeding dragonfruit to an adult in a growth pen. */
+    feedAdult: 20,
+    /** Granted to each adult when player rests. */
+    restAdult: 8,
+    /** Idle trickle per second while adult in a pen. */
+    idlePerSec: 0.15,
+  },
 };
+
+export const ECONOMY = {
+  startingCoins: 200,
+  creativeInfinite: true, // Creative mode treats coins as unlimited
+};
+
+export const WORKERS = {
+  types: {
+    dragonHandler: {
+      id: 'dragonHandler',
+      name: 'Dragon Handler',
+      description: 'Cares for dragons — feeds and grants slight XP near pens.',
+      price: 50,
+    },
+  },
+};
+
 
 
 /**
@@ -160,6 +192,7 @@ export const STARTING = {
   farmPlots: 99,
   dragonPens: 99,
   breedingPens: 99,
+  workerBunkhouses: 99,
 };
 
 export const SAVE_KEY = 'dragon-ranch-save-v2';

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {
   DAY, BUILDINGS, DRAGONS, PLAYER, BREEDING, REST, RARITY,
+  ECONOMY, DRAGON_STATS,
 } from './config.js';
 import { World } from './world.js';
 import { Player } from './player.js';
@@ -9,13 +10,16 @@ import { Input } from './input.js';
 import { BuildingManager, footprintFor } from './buildings.js';
 import { CropManager, createCropMesh } from './crops.js';
 import { DragonManager, createDragonMesh, createEggMesh } from './dragons.js';
+import { WorkerManager } from './workers.js';
 import { UI } from './ui.js';
 import {
   saveGame, loadGame, clearSave, defaultInventory, makeDragonItem, nextInvId,
 } from './save.js';
 import { rollBreedingResult, rarityCss } from './rarity.js';
+import { grantDragonXp } from './stats.js';
+import { tryPurchase } from './marketplace/marketplace.js';
 
-const BUILD_TYPES = new Set(['farmhouse', 'farmPlot', 'dragonPen', 'breedingPen']);
+const BUILD_TYPES = new Set(['farmhouse', 'farmPlot', 'dragonPen', 'breedingPen', 'workerBunkhouse']);
 
 export class Game {
   constructor(canvas, uiRoot) {
@@ -24,6 +28,7 @@ export class Game {
     this.gameTime = DAY.lengthMs * 0.3;
     this.creative = false;
     this.inventory = defaultInventory();
+    this.coins = ECONOMY.startingCoins;
     this.energy = PLAYER.energyMax;
     this.selectedDragonId = this.inventory.dragons[0]?.id ?? null;
     this._autosaveAcc = 0;
@@ -65,7 +70,10 @@ export class Game {
     this.buildings = new BuildingManager(this.scene);
     this.crops = new CropManager(this.scene);
     this.dragons = new DragonManager(this.scene);
+    this.workers = new WorkerManager(this.scene);
     this.ui = new UI(uiRoot);
+    this.ui.coins = this.coins;
+    this.ui.updateCoins(this.coins);
 
     this.ui.onSelect = (id) => this._onSelect(id);
     this.ui.onNewGame = () => this.newGame();
@@ -80,6 +88,8 @@ export class Game {
       this.ui.updateInventory(this.inventory, this.selectedDragonId);
       this.ui.toast(`Spawned ${opts.rarity} ${opts.sex} ${DRAGONS.stages[opts.stage].name}`);
     };
+    this.ui.onPurchase = (listing) => this._purchase(listing);
+
     this.ui.onToggleCreative = () => {
       this.creative = !this.creative;
       if (this.creative) {
@@ -89,6 +99,9 @@ export class Game {
         this.inventory.farmPlots = 999;
         this.inventory.dragonPens = 999;
         this.inventory.breedingPens = 999;
+        this.inventory.workerBunkhouses = 999;
+        this.coins = 99999;
+        this.ui.updateCoins(this.coins);
         // Seed a few rarities for testing if empty of non-common
         const hasLegend = this.inventory.dragons.some((d) => d.rarity === 'Legendary');
         if (!hasLegend) {
@@ -118,6 +131,8 @@ export class Game {
     this.ui.updateInventory(this.inventory, this.selectedDragonId);
     this.ui.updateEnergy(this.energy);
     this.ui.setCreativeVisible(this.creative);
+    this.ui.updateCoins(this.coins);
+    this._refreshHud();
     this.ui.select(null);
   }
 
@@ -195,7 +210,14 @@ export class Game {
     this.inventory.farmPlots = Math.max(0, this.inventory.farmPlots - 1);
     this.inventory.dragonPens = Math.max(0, this.inventory.dragonPens - 1);
     this.inventory.breedingPens = Math.max(0, this.inventory.breedingPens - 1);
-    this.ui.updateInventory(this.inventory, this.selectedDragonId);
+    const bunk = this.buildings.place('workerBunkhouse', -14, -2, 0);
+    if (bunk) {
+      this.inventory.workerBunkhouses = Math.max(0, (this.inventory.workerBunkhouses ?? 99) - 1);
+      this.workers.hire('dragonHandler', bunk, now);
+    }
+    this.coins = ECONOMY.startingCoins;
+    this.ui.updateCoins(this.coins);
+    this._refreshHud();
     this.ui.toast('Demo scene loaded');
   }
 
@@ -206,12 +228,16 @@ export class Game {
     this.gameTime = data.gameTime ?? this.gameTime;
     this.creative = !!data.creative;
     this.energy = data.player?.energy ?? PLAYER.energyMax;
+    this.coins = data.coins ?? ECONOMY.startingCoins;
     this.selectedDragonId = data.selectedDragonId ?? this.inventory.dragons[0]?.id ?? null;
     if (data.player) this.player.mesh.position.set(data.player.x, 0, data.player.z);
     this.buildings.deserialize(data.buildings || []);
     this.crops.deserialize(data.crops || [], this.buildings, now);
     this.dragons.deserialize(data.dragons || [], now, this.buildings);
+    this.workers.deserialize(data.workers || []);
     this.ui.setCreativeVisible(this.creative);
+    this.ui.updateCoins(this.coins);
+    this._refreshHud();
     this.ui.toast('Game loaded');
   }
 
@@ -239,6 +265,7 @@ export class Game {
       farmPlot: 'farmPlots',
       dragonPen: 'dragonPens',
       breedingPen: 'breedingPens',
+      workerBunkhouse: 'workerBunkhouses',
       seeds: 'seeds',
       dragonfruit: 'dragonfruit',
     };
@@ -309,6 +336,9 @@ export class Game {
       this.crops.advanceTime(skipMs);
       this.crops.update(now);
       this.dragons.advanceTime(skipMs, now);
+      for (const d of this.dragons.dragons) {
+        this._grantXpToDragon(d, DRAGON_STATS.xp.restAdult, true);
+      }
       this.energy = PLAYER.energyMax;
       this.ui.updateEnergy(this.energy);
     });
@@ -374,6 +404,8 @@ export class Game {
 
     this.crops.update(now);
     this.dragons.update(now, dt, this.buildings);
+    this.workers.update(dt, this.buildings);
+    this.dragons.tickAdultIdleXp(dt, (d, amt) => this._grantXpToDragon(d, amt, false), DRAGON_STATS.xp.idlePerSec);
     this.dragons.tickBreeding(
       now,
       this.buildings,
@@ -463,6 +495,7 @@ export class Game {
             if (placed) {
               this._consume(selected);
               this._spendEnergy(PLAYER.energyDrainAction);
+              if (selected === 'workerBunkhouse') this._refreshHud();
               this.ui.toast(`Placed ${BUILDINGS[selected].label}`);
             }
           }
@@ -526,9 +559,18 @@ export class Game {
           const reach = this.player.withinReach(dragon.x, dragon.z);
           if (reach) {
             const stage = DRAGONS.stages[dragon.stage]?.name;
-            prompt = stage === 'adult' ? 'Already adult' : 'Press F / click to feed';
-            if (stage !== 'adult' && this.input.interactKey) {
-              if (this.dragons.feed(dragon, now)) {
+            prompt =
+              stage === 'adult'
+                ? 'Press F / click to feed adult (+XP)'
+                : 'Press F / click to feed';
+            if (this.input.interactKey) {
+              if (dragon.stage >= 2) {
+                // Adults: feeding grants XP (no growth boost needed)
+                this._consume('dragonfruit');
+                this._spendEnergy(PLAYER.energyDrainAction);
+                this._grantXpToDragon(dragon, DRAGON_STATS.xp.feedAdult, true);
+                this.ui.toast(`Fed adult — +${DRAGON_STATS.xp.feedAdult} XP`);
+              } else if (this.dragons.feed(dragon, now)) {
                 this._consume('dragonfruit');
                 this._spendEnergy(PLAYER.energyDrainAction);
                 this.ui.toast('Fed dragon — growth sped up!');
@@ -667,5 +709,71 @@ export class Game {
     this.scene.background.copy(bg);
     this.scene.fog.color.copy(bg);
   }
+
+  _refreshHud() {
+    const used = this.workers.count();
+    const cap = this.buildings.bunkCapacity();
+    this.inventory._workersLabel = `Workers: <b>${used}/${cap || 0}</b>`;
+    this.inventory._coins = this.coins;
+    this.ui.updateCoins(this.coins);
+    this.ui.updateInventory(this.inventory, this.selectedDragonId);
+  }
+
+  _purchase(listing) {
+    const bunk = this.workers.findFreeBunk(
+      this.buildings,
+      BUILDINGS.workerBunkhouse.capacity || 4
+    );
+    const result = tryPurchase(listing, {
+      coins: this.coins,
+      inventory: this.inventory,
+      creative: this.creative,
+      bunkCapacity: this.buildings.bunkCapacity(),
+      workerCount: this.workers.count(),
+      onHireWorker: (typeId) => {
+        const free = this.workers.findFreeBunk(
+          this.buildings,
+          BUILDINGS.workerBunkhouse.capacity || 4
+        );
+        if (!free) {
+          return { ok: false, message: 'Need a free bunk in a Worker Bunkhouse' };
+        }
+        const w = this.workers.hire(typeId, free, performance.now());
+        if (!w) return { ok: false, message: 'Could not hire worker' };
+        return { ok: true, worker: w };
+      },
+    });
+    if (result.ok) {
+      if (result.coins != null) this.coins = result.coins;
+      this._refreshHud();
+    }
+    return result;
+  }
+
+  _grantXpToDragon(dragon, amount, toastOnLevel = false) {
+    if (!dragon || amount <= 0) return;
+    const before = dragon.level ?? 1;
+    const result = grantDragonXp(dragon, amount);
+    if (toastOnLevel && result.leveled > 0) {
+      this.ui.toast(
+        `${dragon.rarity || 'Dragon'} leveled up! Lv${before} → Lv${result.level}`,
+        2800,
+        true
+      );
+      // Keep inventory copy in sync if this is a world dragon with matching id
+      if (dragon.id != null) {
+        const inv = this.inventory.dragons.find((d) => d.id === dragon.id);
+        if (inv) {
+          inv.level = dragon.level;
+          inv.xp = dragon.xp;
+        }
+      }
+      if (this.ui.dragonPanelOpen) {
+        this.ui.updateDragonList(this.inventory.dragons, this.selectedDragonId);
+      }
+    }
+    return result;
+  }
+
 }
 

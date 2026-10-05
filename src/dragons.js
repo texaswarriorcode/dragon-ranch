@@ -197,6 +197,7 @@ export class DragonManager {
     const stage = opts.stage ?? 0;
     const rarity = normalizeRarity(opts.rarity || 'Common');
     const level = Math.max(1, Math.floor(opts.level) || 1);
+    const xp = Math.max(0, opts.xp || 0);
     const isBreed = pen.type === 'breedingPen';
     const max = isBreed ? BUILDINGS.breedingPen.maxDragons : BUILDINGS.dragonPen.maxDragons;
 
@@ -223,6 +224,7 @@ export class DragonManager {
       penType: pen.type,
       rarity,
       level,
+      xp: stage >= 2 ? xp : 0,
       mesh,
       x,
       z,
@@ -242,6 +244,7 @@ export class DragonManager {
       stage: dragon.stage,
       rarity: normalizeRarity(dragon.rarity),
       level: dragon.level ?? 1,
+      xp: dragon.xp ?? 0,
     };
     this.scene.remove(dragon.mesh);
     this.dragons = this.dragons.filter((d) => d.id !== dragon.id);
@@ -319,6 +322,16 @@ export class DragonManager {
   getBreedState(penId) {
     return this._ensureBreedState(penId);
   }
+
+  /** Idle XP for adults in pens. Uses grantFn(dragon, amount). */
+  tickAdultIdleXp(dt, grantFn, perSec) {
+    if (!perSec) return;
+    for (const d of this.dragons) {
+      if (d.stage < 2) continue;
+      grantFn(d, perSec * dt);
+    }
+  }
+
 
   update(now, dt, buildings) {
     const pens = buildings.buildings.filter(
@@ -459,6 +472,7 @@ export class DragonManager {
         penType: d.penType,
         rarity: normalizeRarity(d.rarity),
         level: d.level ?? 1,
+        xp: d.xp ?? 0,
         x: d.x,
         z: d.z,
       })),
@@ -507,6 +521,7 @@ export class DragonManager {
         penType: raw.penType || 'dragonPen',
         rarity,
         level: raw.level ?? 1,
+        xp: raw.xp ?? 0,
         mesh,
         x: raw.x,
         z: raw.z,

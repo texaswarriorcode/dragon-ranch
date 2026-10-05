@@ -83,3 +83,69 @@ export function computeDragonStats(rarity = 'Common', level = 1) {
 export function formatStatsLine(stats) {
   return `Lv${stats.level} · HP ${stats.hp} · Def ${stats.defense} · Atk ${stats.attack}`;
 }
+
+/** XP required to advance FROM `level` TO level+1 (level is current). */
+export function xpToNextLevel(level = 1) {
+  const { baseToLevel2, levelReqMult, maxLevel } = DRAGON_STATS.xp;
+  const L = Math.max(1, Math.floor(level) || 1);
+  if (L >= maxLevel) return 0;
+  // L1→2 = base; L2→3 = base*1.1; ... requirement for going from L to L+1
+  // = base * mult^(L-1)
+  let req = baseToLevel2;
+  for (let i = 1; i < L; i++) {
+    req = Math.round(req * levelReqMult);
+  }
+  return req;
+}
+
+/**
+ * Apply XP to an adult dragon. Mutates { xp, level }.
+ * Babies/juveniles (stage < 2) gain nothing.
+ * @returns {{ leveled: number, xp: number, level: number }}
+ */
+export function grantDragonXp(dragon, amount) {
+  const stage = dragon.stage ?? 0;
+  if (stage < 2 || amount <= 0) {
+    return { leveled: 0, xp: dragon.xp || 0, level: dragon.level || 1 };
+  }
+  const maxLevel = DRAGON_STATS.xp.maxLevel;
+  let level = Math.max(1, Math.floor(dragon.level) || 1);
+  let xp = Math.max(0, dragon.xp || 0) + amount;
+  let leveled = 0;
+  while (level < maxLevel) {
+    const need = xpToNextLevel(level);
+    if (xp < need) break;
+    xp -= need;
+    level += 1;
+    leveled += 1;
+  }
+  if (level >= maxLevel) {
+    level = maxLevel;
+    // keep overflow xp or zero — keep overflow for display
+  }
+  dragon.level = level;
+  dragon.xp = Math.round(xp * 10) / 10;
+  return { leveled, xp: dragon.xp, level: dragon.level };
+}
+
+export function xpProgress(dragon) {
+  const level = Math.max(1, Math.floor(dragon.level) || 1);
+  const xp = Math.max(0, dragon.xp || 0);
+  const need = xpToNextLevel(level);
+  const adult = (dragon.stage ?? 0) >= 2;
+  return {
+    level,
+    xp: adult ? xp : 0,
+    need,
+    ratio: !adult || need <= 0 ? (level >= DRAGON_STATS.xp.maxLevel ? 1 : 0) : Math.min(1, xp / need),
+    adult,
+    maxed: level >= DRAGON_STATS.xp.maxLevel,
+  };
+}
+
+export function formatXpLine(dragon) {
+  const p = xpProgress(dragon);
+  if (!p.adult) return 'XP — (adults only)';
+  if (p.maxed) return `XP MAX · Lv${p.level}`;
+  return `XP ${Math.floor(p.xp)}/${p.need}`;
+}

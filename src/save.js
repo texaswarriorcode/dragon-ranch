@@ -1,17 +1,18 @@
-import { SAVE_KEY, SAVE_KEY_LEGACY, STARTING, PLAYER } from './config.js';
+import { SAVE_KEY, SAVE_KEY_LEGACY, STARTING, PLAYER, ECONOMY } from './config.js';
 
 let _id = 1;
 export function nextInvId() {
   return _id++;
 }
 
-export function makeDragonItem({ sex, stage = 0, rarity = 'Common', level = 1, id = null }) {
+export function makeDragonItem({ sex, stage = 0, rarity = 'Common', level = 1, xp = 0, id = null }) {
   return {
     id: id ?? nextInvId(),
     sex,
     stage,
     rarity,
     level: Math.max(1, Math.floor(level) || 1),
+    xp: Math.max(0, xp || 0),
   };
 }
 
@@ -30,6 +31,7 @@ export function defaultInventory() {
     farmPlots: STARTING.farmPlots,
     dragonPens: STARTING.dragonPens,
     breedingPens: STARTING.breedingPens,
+    workerBunkhouses: STARTING.workerBunkhouses ?? 99,
     dragons,
   };
 }
@@ -44,6 +46,7 @@ export function migrateInventory(raw) {
     farmPlots: raw.farmPlots ?? base.farmPlots,
     dragonPens: raw.dragonPens ?? base.dragonPens,
     breedingPens: raw.breedingPens ?? base.breedingPens,
+    workerBunkhouses: raw.workerBunkhouses ?? base.workerBunkhouses,
     dragons: [],
   };
 
@@ -54,6 +57,7 @@ export function migrateInventory(raw) {
         stage: d.stage ?? 0,
         rarity: d.rarity || 'Common',
         level: d.level ?? 1,
+        xp: d.xp ?? 0,
         id: d.id,
       })
     );
@@ -89,6 +93,8 @@ export function saveGame(state) {
       gameTime: state.gameTime,
       creative: state.creative,
       selectedDragonId: state.selectedDragonId,
+      coins: state.coins,
+      workers: state.workers?.serialize?.() ?? state.workers ?? [],
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     return true;
@@ -106,6 +112,7 @@ export function loadGame() {
     const data = JSON.parse(raw);
     data.inventory = migrateInventory(data.inventory);
     if (data.player && data.player.energy == null) data.player.energy = PLAYER.energyMax;
+    if (data.coins == null) data.coins = ECONOMY.startingCoins;
     return data;
   } catch (e) {
     console.warn('Load failed', e);

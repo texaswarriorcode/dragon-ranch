@@ -1,6 +1,6 @@
 import { DRAGONS, RARITY, PLAYER } from './config.js';
 import { rarityCss } from './rarity.js';
-import { computeDragonStats, formatStatsLine } from './stats.js';
+import { computeDragonStats, formatStatsLine, formatXpLine, xpProgress } from './stats.js';
 import { MARKETPLACE_TABS, MARKETPLACE_CATALOG } from './marketplace/catalog.js';
 import { tryPurchase } from './marketplace/marketplace.js';
 
@@ -9,9 +9,10 @@ const HOTBAR_ITEMS = [
   { id: 'farmPlot', label: 'Plot', inv: 'farmPlots', color: '#6b4423', key: '2' },
   { id: 'dragonPen', label: 'Pen', inv: 'dragonPens', color: '#8b7355', key: '3' },
   { id: 'breedingPen', label: 'Breed', inv: 'breedingPens', color: '#9b59b6', key: '4' },
-  { id: 'seeds', label: 'Seeds', inv: 'seeds', color: '#7cb342', key: '5' },
-  { id: 'dragons', label: 'Dragons', inv: 'dragons', color: '#c62828', key: '6' },
-  { id: 'dragonfruit', label: 'Fruit', inv: 'dragonfruit', color: '#e91e8c', key: '7' },
+  { id: 'workerBunkhouse', label: 'Bunks', inv: 'workerBunkhouses', color: '#8d6e63', key: '5' },
+  { id: 'seeds', label: 'Seeds', inv: 'seeds', color: '#7cb342', key: '6' },
+  { id: 'dragons', label: 'Dragons', inv: 'dragons', color: '#c62828', key: '7' },
+  { id: 'dragonfruit', label: 'Fruit', inv: 'dragonfruit', color: '#e91e8c', key: '8' },
 ];
 
 export class UI {
@@ -28,6 +29,7 @@ export class UI {
     this.onToggleCreative = null;
     this.onSelectDragon = null;
     this.onCreativeSpawn = null;
+    this.onPurchase = null; // (listing) => result from game
 
     root.innerHTML = `
       <div class="hud-top">
@@ -39,7 +41,7 @@ export class UI {
         <div class="panel help-panel" id="help-panel">
           <h3>Controls</h3>
           <div><kbd>WASD</kbd> move · <kbd>Q</kbd>/<kbd>E</kbd> cam · scroll zoom · RMB orbit</div>
-          <div><kbd>1-7</kbd> hotbar · <kbd>R</kbd> rotate · <kbd>Esc</kbd> cancel · <kbd>F</kbd>/click interact</div>
+          <div><kbd>1-8</kbd> hotbar · <kbd>R</kbd> rotate · <kbd>Esc</kbd> cancel · <kbd>F</kbd>/click interact</div>
           <div><kbd>I</kbd> / <kbd>Tab</kbd> dragon inventory · <kbd>M</kbd> marketplace · rest at door</div>
           <div style="margin-top:6px" class="btn-row">
             <button class="ui-btn" id="btn-help-hide">Hide help</button>
@@ -212,10 +214,14 @@ export class UI {
       el.className = 'dragon-item' + (d.id === selectedId ? ' selected' : '');
       const stage = DRAGONS.stages[d.stage]?.name || 'baby';
       const stats = computeDragonStats(d.rarity || 'Common', d.level ?? 1);
+      const xp = xpProgress(d);
+      const xpPct = Math.floor(xp.ratio * 100);
       el.innerHTML = `
         <span class="rarity-pip" style="background:${rarityCss(d.rarity)}"></span>
         <span class="di-main">${d.sex === 'male' ? '♂' : '♀'} ${stage}
           <span class="di-stats">${formatStatsLine(stats)}</span>
+          <span class="xp-bar"><i style="width:${xpPct}%"></i></span>
+          <span class="di-stats">${formatXpLine(d)}</span>
         </span>
         <span class="di-rarity" style="color:${rarityCss(d.rarity)}">${d.rarity}</span>
       `;
@@ -239,10 +245,13 @@ export class UI {
     }
     const males = (inv.dragons || []).filter((d) => d.sex === 'male').length;
     const females = (inv.dragons || []).filter((d) => d.sex === 'female').length;
+    const workers = inv._workersLabel || 'Workers: —';
     this.invStrip.innerHTML = `
       <div class="row"><span class="dot" style="background:#7cb342"></span> Seeds: <b>${inv.seeds}</b></div>
       <div class="row"><span class="dot" style="background:#e91e8c"></span> Dragonfruit: <b>${inv.dragonfruit}</b></div>
       <div class="row"><span class="dot" style="background:#c62828"></span> Dragons: <b>${inv.dragons?.length || 0}</b> (♂${males} ♀${females})</div>
+      <div class="row"><span class="dot" style="background:#5c6bc0"></span> ${workers}</div>
+      <div class="row"><span class="dot" style="background:#ffe082"></span> Coins: <b>${inv._coins ?? 0}</b></div>
     `;
     if (this.dragonPanelOpen) this.updateDragonList(inv.dragons || [], selectedDragonId);
   }
@@ -321,7 +330,10 @@ export class UI {
     const rarity = dragon.rarity || 'Common';
     const col = rarityCss(rarity);
     const stats = computeDragonStats(rarity, dragon.level ?? 1);
-    return `<b>Red Dragon</b> — ${sex}<br>Stage: ${stage}<br><span style="color:${col}">★ ${rarity}</span><br>${formatStatsLine(stats)}`;
+    const xp = formatXpLine(dragon);
+    const prog = xpProgress(dragon);
+    const bar = `<span class="xp-bar tip"><i style="width:${Math.floor(prog.ratio * 100)}%"></i></span>`;
+    return `<b>Red Dragon</b> — ${sex}<br>Stage: ${stage}<br><span style="color:${col}">★ ${rarity}</span><br>${formatStatsLine(stats)}<br>${xp}${bar}`;
   }
 
 
@@ -380,8 +392,14 @@ export class UI {
         e.stopPropagation();
         const id = btn.dataset.id;
         const listing = (MARKETPLACE_CATALOG[cat] || []).find((l) => l.id === id);
-        const result = tryPurchase(listing, { coins: this.coins });
-        this.toast(result.message || 'Not for sale yet');
+        const result = this.onPurchase
+          ? this.onPurchase(listing)
+          : tryPurchase(listing, { coins: this.coins });
+        this.toast(result.message || 'Not for sale yet', result.ok ? 2200 : 2500, !!result.ok && listing?.grant?.kind === 'worker');
+        if (result.ok) {
+          if (result.coins != null) this.updateCoins(result.coins);
+          this._renderMarketBody();
+        }
       });
     });
   }
