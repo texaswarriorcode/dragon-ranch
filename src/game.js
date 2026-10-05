@@ -347,6 +347,9 @@ export class Game {
       this.ui.setDragonPanel(!this.ui.dragonPanelOpen);
       this.ui.updateDragonList(this.inventory.dragons, this.selectedDragonId);
     }
+    if (this.input.pressed('m')) {
+      this.ui.setMarketplace(!this.ui.marketplaceOpen);
+    }
 
     // Energy drain while moving
     const speedMult =
@@ -609,8 +612,9 @@ export class Game {
     }
 
     if (this.input.cancel) {
-      if (this.ui.dragonPanelOpen) this.ui.setDragonPanel(false);
-      else if (this.ui.selected) this.ui.select(null);
+      if (!this.ui.closeTopPanel()) {
+        if (this.ui.selected) this.ui.select(null);
+      }
     }
 
     this.ui.setPrompt(prompt);

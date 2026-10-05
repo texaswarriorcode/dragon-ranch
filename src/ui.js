@@ -1,5 +1,7 @@
 import { DRAGONS, RARITY, PLAYER } from './config.js';
 import { rarityCss } from './rarity.js';
+import { MARKETPLACE_TABS, MARKETPLACE_CATALOG } from './marketplace/catalog.js';
+import { tryPurchase } from './marketplace/marketplace.js';
 
 const HOTBAR_ITEMS = [
   { id: 'farmhouse', label: 'House', inv: 'farmhouses', color: '#c4a574', key: '1' },
@@ -17,6 +19,9 @@ export class UI {
     this.selected = null;
     this.selectedDragonId = null;
     this.dragonPanelOpen = false;
+    this.marketplaceOpen = false;
+    this.marketplaceTab = MARKETPLACE_TABS[0].id;
+    this.coins = 0; // stub currency display — economy wired later
     this.onSelect = null;
     this.onNewGame = null;
     this.onToggleCreative = null;
@@ -34,9 +39,10 @@ export class UI {
           <h3>Controls</h3>
           <div><kbd>WASD</kbd> move · <kbd>Q</kbd>/<kbd>E</kbd> cam · scroll zoom · RMB orbit</div>
           <div><kbd>1-7</kbd> hotbar · <kbd>R</kbd> rotate · <kbd>Esc</kbd> cancel · <kbd>F</kbd>/click interact</div>
-          <div><kbd>I</kbd> / <kbd>Tab</kbd> dragon inventory · rest at farmhouse door</div>
+          <div><kbd>I</kbd> / <kbd>Tab</kbd> dragon inventory · <kbd>M</kbd> marketplace · rest at door</div>
           <div style="margin-top:6px" class="btn-row">
             <button class="ui-btn" id="btn-help-hide">Hide help</button>
+            <button class="ui-btn" id="btn-market">Marketplace</button>
             <button class="ui-btn" id="btn-creative">Creative</button>
             <button class="ui-btn danger" id="btn-new">New game</button>
           </div>
@@ -60,6 +66,17 @@ export class UI {
           <div class="btn-row" id="spawn-row"></div>
         </div>
       </div>
+      <div class="market-panel hidden" id="market-panel">
+        <div class="market-header">
+          <div class="market-title-row">
+            <h3>Marketplace</h3>
+            <div class="coins-display" id="coins-display">Coins: <b>0</b></div>
+          </div>
+          <button class="ui-btn" id="btn-market-close">Close</button>
+        </div>
+        <div class="market-tabs" id="market-tabs"></div>
+        <div class="market-body" id="market-body"></div>
+      </div>
     `;
 
     this.hotbarEl = root.querySelector('#hotbar');
@@ -77,9 +94,15 @@ export class UI {
     this.dragonList = root.querySelector('#dragon-list');
     this.creativeSpawn = root.querySelector('#creative-spawn');
     this.spawnRow = root.querySelector('#spawn-row');
+    this.marketPanel = root.querySelector('#market-panel');
+    this.marketTabs = root.querySelector('#market-tabs');
+    this.marketBody = root.querySelector('#market-body');
+    this.coinsDisplay = root.querySelector('#coins-display');
 
     this._buildHotbar();
     this._buildCreativeSpawn();
+    this._buildMarketTabs();
+    this._renderMarketBody();
 
     root.querySelector('#btn-new').addEventListener('click', () => {
       if (confirm('Start a new game? Current progress will be erased.')) this.onNewGame?.();
@@ -92,6 +115,8 @@ export class UI {
       this.helpPanel.style.display = this.helpPanel.style.display === 'none' ? '' : 'none';
     });
     root.querySelector('#btn-dragon-close').addEventListener('click', () => this.setDragonPanel(false));
+    root.querySelector('#btn-market').addEventListener('click', () => this.setMarketplace(!this.marketplaceOpen));
+    root.querySelector('#btn-market-close').addEventListener('click', () => this.setMarketplace(false));
   }
 
   _buildHotbar() {
@@ -155,6 +180,7 @@ export class UI {
   setDragonPanel(open) {
     this.dragonPanelOpen = open;
     this.dragonPanel.classList.toggle('hidden', !open);
+    if (open) this.setMarketplace(false);
   }
 
   updateDragonList(dragons, selectedId) {
@@ -275,6 +301,99 @@ export class UI {
     const rarity = dragon.rarity || 'Common';
     const col = rarityCss(rarity);
     return `<b>Red Dragon</b> — ${sex}<br>Stage: ${stage}<br><span style="color:${col}">★ ${rarity}</span>`;
+  }
+
+
+  _buildMarketTabs() {
+    this.marketTabs.innerHTML = '';
+    for (const tab of MARKETPLACE_TABS) {
+      const btn = document.createElement('button');
+      btn.className = 'market-tab' + (tab.id === this.marketplaceTab ? ' active' : '');
+      btn.textContent = tab.label;
+      btn.dataset.id = tab.id;
+      btn.addEventListener('click', () => {
+        this.marketplaceTab = tab.id;
+        this._buildMarketTabs();
+        this._renderMarketBody();
+      });
+      this.marketTabs.appendChild(btn);
+    }
+  }
+
+  _renderMarketBody() {
+    const cat = this.marketplaceTab;
+    const listings = MARKETPLACE_CATALOG[cat] || [];
+    const real = listings.filter((l) => !l.comingSoon);
+    const stubs = listings.filter((l) => l.comingSoon);
+
+    let html = '';
+    if (real.length === 0) {
+      html += `<div class="market-empty">No listings yet — assets coming soon</div>`;
+    }
+    html += '<div class="market-grid">';
+    const show = real.length ? real : stubs;
+    for (const listing of show) {
+      const soon = !!listing.comingSoon;
+      html += `
+        <div class="market-card${soon ? ' soon' : ''}" data-id="${listing.id}">
+          <div class="market-sil"></div>
+          <div class="market-card-name">${listing.name}</div>
+          <div class="market-card-desc">${listing.description || ''}</div>
+          <div class="market-card-footer">
+            <span class="market-price">${soon ? '—' : listing.price + ' 🪙'}</span>
+            <button class="ui-btn market-buy" data-id="${listing.id}" ${soon ? 'disabled' : ''}>
+              ${soon ? 'Coming soon' : 'Buy'}
+            </button>
+          </div>
+        </div>`;
+    }
+    // If we have real items, still show stubs grayed below for layout hint? Spec says optionally 2-3 grayed cards when empty. When real exist, just show real.
+    if (real.length === 0 && stubs.length === 0) {
+      // nothing
+    }
+    html += '</div>';
+    this.marketBody.innerHTML = html;
+
+    this.marketBody.querySelectorAll('.market-buy').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const listing = (MARKETPLACE_CATALOG[cat] || []).find((l) => l.id === id);
+        const result = tryPurchase(listing, { coins: this.coins });
+        this.toast(result.message || 'Not for sale yet');
+      });
+    });
+  }
+
+  setMarketplace(open) {
+    this.marketplaceOpen = open;
+    this.marketPanel.classList.toggle('hidden', !open);
+    if (open) {
+      this.setDragonPanel(false);
+      this.updateCoins(this.coins);
+      this._buildMarketTabs();
+      this._renderMarketBody();
+    }
+  }
+
+  updateCoins(n) {
+    this.coins = n ?? 0;
+    if (this.coinsDisplay) {
+      this.coinsDisplay.innerHTML = `Coins: <b>${this.coins}</b>`;
+    }
+  }
+
+  /** Close topmost modal panel. Returns true if something was closed. */
+  closeTopPanel() {
+    if (this.marketplaceOpen) {
+      this.setMarketplace(false);
+      return true;
+    }
+    if (this.dragonPanelOpen) {
+      this.setDragonPanel(false);
+      return true;
+    }
+    return false;
   }
 
   get hotbarItems() {

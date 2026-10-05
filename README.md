@@ -36,6 +36,7 @@ node scripts/test-breeding-odds.mjs
 | **R** | Rotate building ghost |
 | **Esc** | Cancel / close panel |
 | **I** / **Tab** | Dragon inventory |
+| **M** | Marketplace |
 
 ### Hotbar
 
@@ -51,6 +52,12 @@ node scripts/test-breeding-odds.mjs
 - **Rest:** near a farmhouse door, **F** to rest — fade, skip time, advance growth, restore energy
 - **Energy:** light stamina bar; low energy slows movement (never blocks play)
 - **Save/load:** `localStorage` autosave (v2; legacy v1 migrates to Common dragons)
+
+## Marketplace
+
+Open with **M** or the **Marketplace** button. Tabs: Farm Plots, Dragons, Dragon Buildings, Farm Workers, Farm Buildings.
+
+Catalog data lives in `src/marketplace/catalog.js` (`MARKETPLACE_CATALOG`). Purchase stub: `tryPurchase()` in `src/marketplace/marketplace.js` (returns “Not for sale yet” until real assets are added). Coins display is a placeholder (starts at 0).
 
 ## Creative mode
 
