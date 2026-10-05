@@ -79,7 +79,7 @@ export class Player {
   }
 
   /** Move with camera-relative WASD. collisions = array of {minX,maxX,minZ,maxZ}. */
-  update(dt, input, cameraYaw, world, collisions) {
+  update(dt, input, cameraYaw, world, collisions, speedMult = 1) {
     const forward = new THREE.Vector3(-Math.sin(cameraYaw), 0, -Math.cos(cameraYaw));
     const right = new THREE.Vector3(Math.cos(cameraYaw), 0, -Math.sin(cameraYaw));
 
@@ -91,7 +91,7 @@ export class Player {
 
     this.moving = wish.lengthSq() > 0.001;
     if (this.moving) {
-      wish.normalize().multiplyScalar(this.speed * dt);
+      wish.normalize().multiplyScalar(this.speed * speedMult * dt);
       const pos = this.mesh.position;
 
       // Axis-separated collision

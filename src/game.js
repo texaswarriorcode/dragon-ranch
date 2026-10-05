@@ -1,28 +1,34 @@
 import * as THREE from 'three';
-import { WORLD, DAY, BUILDINGS, PLAYER, DRAGONS } from './config.js';
+import {
+  DAY, BUILDINGS, DRAGONS, PLAYER, BREEDING, REST, RARITY,
+} from './config.js';
 import { World } from './world.js';
 import { Player } from './player.js';
 import { FollowCamera } from './camera.js';
 import { Input } from './input.js';
 import { BuildingManager, footprintFor } from './buildings.js';
 import { CropManager, createCropMesh } from './crops.js';
-import { DragonManager, createDragonMesh } from './dragons.js';
+import { DragonManager, createDragonMesh, createEggMesh } from './dragons.js';
 import { UI } from './ui.js';
-import { saveGame, loadGame, clearSave, defaultInventory } from './save.js';
+import {
+  saveGame, loadGame, clearSave, defaultInventory, makeDragonItem, nextInvId,
+} from './save.js';
+import { rollBreedingResult, rarityCss } from './rarity.js';
 
-const BUILD_TYPES = new Set(['farmhouse', 'farmPlot', 'dragonPen']);
+const BUILD_TYPES = new Set(['farmhouse', 'farmPlot', 'dragonPen', 'breedingPen']);
 
 export class Game {
   constructor(canvas, uiRoot) {
     this.canvas = canvas;
     this.clock = new THREE.Clock();
-    this.gameTime = DAY.lengthMs * 0.3; // start morning
+    this.gameTime = DAY.lengthMs * 0.3;
     this.creative = false;
     this.inventory = defaultInventory();
+    this.energy = PLAYER.energyMax;
+    this.selectedDragonId = this.inventory.dragons[0]?.id ?? null;
     this._autosaveAcc = 0;
-    this._hoverDragon = null;
+    this._resting = false;
 
-    // Renderer
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -30,16 +36,13 @@ export class Game {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    // Scene
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87b8e0);
     this.scene.fog = new THREE.Fog(0x87b8e0, 80, 220);
 
-    // Camera
     this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 400);
     this.followCam = new FollowCamera(this.camera, canvas);
 
-    // Lights
     this.hemi = new THREE.HemisphereLight(0xb1e1ff, 0x4a7a32, 0.55);
     this.scene.add(this.hemi);
     this.sun = new THREE.DirectionalLight(0xfff2d0, 1.1);
@@ -56,7 +59,6 @@ export class Game {
     this.amb = new THREE.AmbientLight(0xffffff, 0.25);
     this.scene.add(this.amb);
 
-    // Systems
     this.world = new World(this.scene);
     this.player = new Player(this.scene);
     this.input = new Input(canvas);
@@ -67,51 +69,68 @@ export class Game {
 
     this.ui.onSelect = (id) => this._onSelect(id);
     this.ui.onNewGame = () => this.newGame();
+    this.ui.onSelectDragon = (id) => {
+      this.selectedDragonId = id;
+    };
+    this.ui.onCreativeSpawn = (opts) => {
+      if (!this.creative) return;
+      const item = makeDragonItem(opts);
+      this.inventory.dragons.push(item);
+      this.selectedDragonId = item.id;
+      this.ui.updateInventory(this.inventory, this.selectedDragonId);
+      this.ui.toast(`Spawned ${opts.rarity} ${opts.sex} ${DRAGONS.stages[opts.stage].name}`);
+    };
     this.ui.onToggleCreative = () => {
       this.creative = !this.creative;
       if (this.creative) {
         this.inventory.seeds = 999;
         this.inventory.dragonfruit = 999;
-        this.inventory.maleDragons = 999;
-        this.inventory.femaleDragons = 999;
         this.inventory.farmhouses = 999;
         this.inventory.farmPlots = 999;
         this.inventory.dragonPens = 999;
-        this.ui.toast('Creative mode ON — unlimited items');
+        this.inventory.breedingPens = 999;
+        // Seed a few rarities for testing if empty of non-common
+        const hasLegend = this.inventory.dragons.some((d) => d.rarity === 'Legendary');
+        if (!hasLegend) {
+          for (const tier of ['Uncommon', 'Rare', 'Epic', 'Legendary']) {
+            this.inventory.dragons.push(makeDragonItem({ sex: 'male', stage: 2, rarity: tier }));
+            this.inventory.dragons.push(makeDragonItem({ sex: 'female', stage: 2, rarity: tier }));
+          }
+        }
+        this.ui.toast('Creative ON — unlimited builds + spawn any dragon');
       } else {
         this.ui.toast('Creative mode OFF');
       }
-      this.ui.updateInventory(this.inventory);
+      this.ui.setCreativeVisible(this.creative);
+      this.ui.updateInventory(this.inventory, this.selectedDragonId);
     };
 
     window.addEventListener('resize', () => this._onResize());
 
-    // Demo / load
     const params = new URLSearchParams(location.search);
-    if (params.get('demo') === '1') {
-      this._loadDemo();
-    } else {
+    if (params.get('demo') === '1') this._loadDemo();
+    else {
       const saved = loadGame();
       if (saved) this._applySave(saved);
       else this._placeStarterHint();
     }
 
-    this.ui.updateInventory(this.inventory);
+    this.ui.updateInventory(this.inventory, this.selectedDragonId);
+    this.ui.updateEnergy(this.energy);
+    this.ui.setCreativeVisible(this.creative);
     this.ui.select(null);
   }
 
   _placeStarterHint() {
-    // Spawn player near origin; nothing pre-placed
     this.player.mesh.position.set(2, 0, 8);
   }
-
 
   _loadDemo() {
     clearSave();
     this.inventory = defaultInventory();
+    this.energy = PLAYER.energyMax;
     this.gameTime = DAY.lengthMs * 0.35;
     this.player.mesh.position.set(4, 0, 14);
-
     const now = performance.now();
 
     this.buildings.place('farmhouse', -4, -2, 0);
@@ -123,11 +142,10 @@ export class Game {
         for (let lx = 0; lx < 4; lx++) {
           this.crops.plant(plot, lx, lz, now);
           const c = this.crops.get(plot.id, lx, lz);
-          const want = stages[lx + lz * 4];
-          c.stage = want;
+          c.stage = stages[lx + lz * 4];
           c.stageStart = now;
           this.scene.remove(c.mesh);
-          c.mesh = createCropMesh(want);
+          c.mesh = createCropMesh(c.stage);
           c.mesh.position.set(c.worldX, 0.1, c.worldZ);
           this.scene.add(c.mesh);
         }
@@ -137,46 +155,63 @@ export class Game {
     const pen = this.buildings.place('dragonPen', 12, -2, 0);
     if (pen) {
       const specs = [
-        { sex: 'male', stage: 1 },
-        { sex: 'female', stage: 2 },
-        { sex: 'male', stage: 0 },
-        { sex: 'female', stage: 0 },
+        { sex: 'male', stage: 1, rarity: 'Common' },
+        { sex: 'female', stage: 2, rarity: 'Uncommon' },
+        { sex: 'male', stage: 0, rarity: 'Common' },
+        { sex: 'female', stage: 0, rarity: 'Common' },
       ];
       for (const spec of specs) {
-        const d = this.dragons.place(spec.sex, pen, now);
-        if (!d) continue;
-        if (spec.stage > 0) {
-          d.stage = spec.stage;
-          d.stageStart = now;
-          const pos = d.mesh.position.clone();
-          this.scene.remove(d.mesh);
-          d.mesh = createDragonMesh(d.sex, DRAGONS.stages[spec.stage].name);
-          d.mesh.position.copy(pos);
-          this.scene.add(d.mesh);
-        }
+        this.dragons.place(spec, pen, now);
       }
     }
+
+    // Breeding pen with two adults + egg for screenshots (?demo=1)
+    const bp = this.buildings.place('breedingPen', 22, -2, 0);
+    if (bp) {
+      this.dragons.place({ sex: 'male', stage: 2, rarity: 'Epic' }, bp, now);
+      this.dragons.place({ sex: 'female', stage: 2, rarity: 'Epic' }, bp, now);
+      const st = this.dragons.getBreedState(bp.id);
+      const mesh = createEggMesh('Exceptional');
+      mesh.position.set(bp.tx + bp.w / 2, 0.15, bp.tz + bp.d / 2);
+      this.scene.add(mesh);
+      st.egg = {
+        rarity: 'Exceptional',
+        sex: 'female',
+        upgraded: true,
+        hatchAt: now + BREEDING.hatchDurationMs,
+        mesh,
+        parentA: 'Epic',
+        parentB: 'Epic',
+      };
+    }
+
+    // Legendary adult in inventory for panel screenshots
+    this.inventory.dragons.push(makeDragonItem({ sex: 'male', stage: 2, rarity: 'Legendary' }));
+    this.inventory.dragons.push(makeDragonItem({ sex: 'female', stage: 2, rarity: 'Exceptional' }));
+    this.inventory.dragons.push(makeDragonItem({ sex: 'male', stage: 0, rarity: 'Rare' }));
+    this.selectedDragonId = this.inventory.dragons[0]?.id;
 
     this.inventory.farmhouses = Math.max(0, this.inventory.farmhouses - 1);
     this.inventory.farmPlots = Math.max(0, this.inventory.farmPlots - 1);
     this.inventory.dragonPens = Math.max(0, this.inventory.dragonPens - 1);
-    this.inventory.maleDragons = Math.max(0, this.inventory.maleDragons - 2);
-    this.inventory.femaleDragons = Math.max(0, this.inventory.femaleDragons - 2);
-    this.ui.updateInventory(this.inventory);
+    this.inventory.breedingPens = Math.max(0, this.inventory.breedingPens - 1);
+    this.ui.updateInventory(this.inventory, this.selectedDragonId);
     this.ui.toast('Demo scene loaded');
   }
 
+
   _applySave(data) {
     const now = performance.now();
-    this.inventory = { ...defaultInventory(), ...data.inventory };
+    this.inventory = data.inventory || defaultInventory();
     this.gameTime = data.gameTime ?? this.gameTime;
     this.creative = !!data.creative;
-    if (data.player) {
-      this.player.mesh.position.set(data.player.x, 0, data.player.z);
-    }
+    this.energy = data.player?.energy ?? PLAYER.energyMax;
+    this.selectedDragonId = data.selectedDragonId ?? this.inventory.dragons[0]?.id ?? null;
+    if (data.player) this.player.mesh.position.set(data.player.x, 0, data.player.z);
     this.buildings.deserialize(data.buildings || []);
     this.crops.deserialize(data.crops || [], this.buildings, now);
-    this.dragons.deserialize(data.dragons || [], now);
+    this.dragons.deserialize(data.dragons || [], now, this.buildings);
+    this.ui.setCreativeVisible(this.creative);
     this.ui.toast('Game loaded');
   }
 
@@ -186,11 +221,8 @@ export class Game {
   }
 
   _onSelect(id) {
-    if (BUILD_TYPES.has(id)) {
-      this.buildings.setGhost(id);
-    } else {
-      this.buildings.clearGhost();
-    }
+    if (BUILD_TYPES.has(id)) this.buildings.setGhost(id);
+    else this.buildings.clearGhost();
   }
 
   _onResize() {
@@ -206,29 +238,82 @@ export class Game {
       farmhouse: 'farmhouses',
       farmPlot: 'farmPlots',
       dragonPen: 'dragonPens',
+      breedingPen: 'breedingPens',
       seeds: 'seeds',
-      maleDragon: 'maleDragons',
-      femaleDragon: 'femaleDragons',
       dragonfruit: 'dragonfruit',
     };
     return map[selected];
   }
 
   _hasItem(selected) {
+    if (selected === 'dragons') {
+      return !!this._getSelectedDragonItem();
+    }
     const k = this._invKeyFor(selected);
     return k && this.inventory[k] > 0;
+  }
+
+  _getSelectedDragonItem() {
+    if (this.selectedDragonId == null) return this.inventory.dragons[0] || null;
+    return this.inventory.dragons.find((d) => d.id === this.selectedDragonId) || null;
   }
 
   _consume(selected, n = 1) {
     const k = this._invKeyFor(selected);
     if (!k) return;
     if (!this.creative) this.inventory[k] = Math.max(0, this.inventory[k] - n);
-    this.ui.updateInventory(this.inventory);
+    this.ui.updateInventory(this.inventory, this.selectedDragonId);
+  }
+
+  _consumeDragonItem(item) {
+    this.inventory.dragons = this.inventory.dragons.filter((d) => d.id !== item.id);
+    if (this.selectedDragonId === item.id) {
+      this.selectedDragonId = this.inventory.dragons[0]?.id ?? null;
+    }
+    this.ui.updateInventory(this.inventory, this.selectedDragonId);
   }
 
   _add(invKey, n = 1) {
     this.inventory[invKey] = (this.inventory[invKey] || 0) + n;
-    this.ui.updateInventory(this.inventory);
+    this.ui.updateInventory(this.inventory, this.selectedDragonId);
+  }
+
+  _addDragonItem(item) {
+    this.inventory.dragons.push(item);
+    this.selectedDragonId = item.id;
+    this.ui.updateInventory(this.inventory, this.selectedDragonId);
+  }
+
+  _spendEnergy(amount) {
+    this.energy = Math.max(0, this.energy - amount);
+    this.ui.updateEnergy(this.energy);
+  }
+
+  async _doRest() {
+    if (this._resting) return;
+    this._resting = true;
+    const frac = ((this.gameTime % DAY.lengthMs) + DAY.lengthMs) % DAY.lengthMs / DAY.lengthMs;
+    let skipMs;
+    if (frac >= DAY.sunset || frac < DAY.sunrise) {
+      // Skip to next morning
+      let target = Math.floor(this.gameTime / DAY.lengthMs) * DAY.lengthMs + REST.morningFrac * DAY.lengthMs;
+      if (target <= this.gameTime) target += DAY.lengthMs;
+      skipMs = target - this.gameTime;
+    } else {
+      skipMs = (REST.skipHoursIfDay / 24) * DAY.lengthMs;
+    }
+
+    await this.ui.fadeRest(REST.fadeMs, () => {
+      this.gameTime += skipMs;
+      const now = performance.now();
+      this.crops.advanceTime(skipMs);
+      this.crops.update(now);
+      this.dragons.advanceTime(skipMs, now);
+      this.energy = PLAYER.energyMax;
+      this.ui.updateEnergy(this.energy);
+    });
+    this.ui.toast('You feel rested');
+    this._resting = false;
   }
 
   start() {
@@ -236,48 +321,125 @@ export class Game {
   }
 
   _frame() {
+    if (this._resting) {
+      this.renderer.render(this.scene, this.camera);
+      this.input.endFrame();
+      return;
+    }
+
     const dt = Math.min(this.clock.getDelta(), 0.05);
     const now = performance.now();
     this.gameTime += dt * 1000;
 
-    // Hotbar number keys
+    // Hotbar + inventory panel keys
     for (const item of this.ui.hotbarItems) {
       if (this.input.pressed(item.key)) {
-        this.ui.select(this.ui.selected === item.id ? null : item.id);
+        if (item.id === 'dragons') {
+          this.ui.setDragonPanel(!this.ui.dragonPanelOpen);
+          this.ui.select('dragons');
+          this.ui.updateDragonList(this.inventory.dragons, this.selectedDragonId);
+        } else {
+          this.ui.select(this.ui.selected === item.id ? null : item.id);
+        }
       }
     }
+    if (this.input.pressed('i') || this.input.pressed('tab')) {
+      this.ui.setDragonPanel(!this.ui.dragonPanelOpen);
+      this.ui.updateDragonList(this.inventory.dragons, this.selectedDragonId);
+    }
 
-    // Camera + player
+    // Energy drain while moving
+    const speedMult =
+      this.energy < PLAYER.lowEnergyThreshold ? PLAYER.lowEnergySpeedMult : 1;
+
     this.followCam.update(dt, this.player.position, this.input);
-    this.player.update(dt, this.input, this.followCam.yawAngle, this.world, this.buildings.getColliders());
+    this.player.update(
+      dt,
+      this.input,
+      this.followCam.yawAngle,
+      this.world,
+      this.buildings.getColliders(),
+      speedMult
+    );
+    if (this.player.moving) {
+      this._spendEnergy(PLAYER.energyDrainPerSecMoving * dt);
+    }
     this.world.updateGrass(this.player.position, this.clock.elapsedTime);
 
-    // Day/night
     this._updateLighting();
     this.ui.updateDay(this.gameTime, DAY.lengthMs);
 
-    // Growth systems
     this.crops.update(now);
     this.dragons.update(now, dt, this.buildings);
+    this.dragons.tickBreeding(
+      now,
+      this.buildings,
+      BREEDING,
+      rollBreedingResult,
+      (egg) => {
+        this.ui.toast(`An egg was laid! (${egg.rarity})`);
+      },
+      (egg) => {
+        const item = makeDragonItem({ sex: egg.sex, stage: 0, rarity: egg.rarity });
+        this._addDragonItem(item);
+        const flair = egg.upgraded;
+        const msg = egg.upgraded
+          ? `✨ HATCHED ${egg.rarity.toUpperCase()} ${egg.sex} baby! Upgrade!`
+          : `Hatched ${egg.rarity} ${egg.sex} baby dragon`;
+        this.ui.toast(msg, flair ? 3500 : 2200, flair);
+      }
+    );
 
-    // Cursor ground hit / build ghost
     const hit = this.world.groundHit(this.camera, this.input.mouseNdc.x, this.input.mouseNdc.y);
     let prompt = '';
     let tooltip = '';
+    let breedHud = '';
+
+    // Rest at farmhouse door
+    const nearHouse = this.buildings.findFarmhouseNear(
+      this.player.position.x,
+      this.player.position.z,
+      4.5
+    );
+    if (nearHouse && !this.ui.selected) {
+      prompt = 'Press F to rest';
+      if (this.input.interactKey) {
+        this._doRest();
+        this.input.endFrame();
+        return;
+      }
+    }
 
     if (hit) {
       const { tx, tz } = this.world.tileFromWorld(hit.x, hit.z);
       this.world.showGridAt(tx, tz);
-
       const selected = this.ui.selected;
+
+      // Breeding progress when looking at breeding pen
+      const bpLook = this.buildings.findBreedingPenAt(tx, tz);
+      if (bpLook) {
+        const prog = this.dragons.getBreedProgress(bpLook.id, now, BREEDING);
+        if (prog) {
+          const pct = Math.floor((prog.progress || 0) * 100);
+          if (prog.phase === 'breeding') {
+            breedHud = `Breeding… ${pct}%<div class="pbar"><i style="width:${pct}%"></i></div>`;
+          } else if (prog.phase === 'hatching') {
+            breedHud = `Egg hatching (${prog.egg.rarity})… ${pct}%<div class="pbar"><i style="width:${pct}%"></i></div>`;
+          } else if (prog.phase === 'cooldown') {
+            breedHud = `Breeding cooldown… ${pct}%<div class="pbar"><i style="width:${pct}%"></i></div>`;
+          } else if (prog.phase === 'ready') {
+            breedHud = 'Pair ready to breed';
+          } else {
+            breedHud = 'Need 1 adult ♂ and 1 adult ♀';
+          }
+        }
+      }
 
       if (selected && BUILD_TYPES.has(selected)) {
         if (this.input.rotateBuild) this.buildings.rotateGhost();
-        if (this.input.cancel) {
-          this.ui.select(null);
-        } else {
+        if (this.input.cancel) this.ui.select(null);
+        else {
           const { w, d } = footprintFor(selected, this.buildings.ghostRot);
-          // Snap ghost so footprint SW corner is on tile under cursor (adjusted so cursor is near center)
           const gtx = tx - Math.floor(w / 2);
           const gtz = tz - Math.floor(d / 2);
           const inReach = this.player.withinReach(gtx + w / 2, gtz + d / 2);
@@ -291,13 +453,13 @@ export class Game {
             : !inReach
               ? 'Too far away'
               : !this._hasItem(selected)
-                ? 'None left in inventory'
+                ? 'None left'
                 : 'Cannot place here';
-
           if (valid && this.input.interactKey) {
             const placed = this.buildings.place(selected, gtx, gtz, this.buildings.ghostRot);
             if (placed) {
               this._consume(selected);
+              this._spendEnergy(PLAYER.energyDrainAction);
               this.ui.toast(`Placed ${BUILDINGS[selected].label}`);
             }
           }
@@ -311,35 +473,49 @@ export class Game {
             if (this.input.interactKey) {
               if (this.crops.plant(info.plot, info.lx, info.lz, now)) {
                 this._consume('seeds');
+                this._spendEnergy(PLAYER.energyDrainAction);
                 this.ui.toast('Planted dragonfruit seed');
               }
             }
           } else if (!reach) prompt = 'Move closer to plant';
         } else if (info?.crop) {
-          prompt = info.crop.stage >= 4 ? 'Ready to harvest! (select hand / empty)' : 'Tile already planted';
+          prompt = info.crop.stage >= 4 ? 'Ready to harvest!' : 'Already planted';
+        } else prompt = 'Plant seeds on a farm plot';
+      } else if (selected === 'dragons') {
+        const item = this._getSelectedDragonItem();
+        const pen = this.buildings.findAnyPenAt(tx, tz);
+        if (!item) prompt = 'No dragon selected (press I)';
+        else if (!pen) {
+          prompt =
+            item.stage >= 2
+              ? 'Place adults in a pen or breeding pen'
+              : 'Place babies/juveniles in a dragon pen';
         } else {
-          prompt = 'Plant seeds on a farm plot';
-        }
-      } else if (selected === 'maleDragon' || selected === 'femaleDragon') {
-        const pen = this.buildings.findPenAt(tx, tz);
-        const sex = selected === 'maleDragon' ? 'male' : 'female';
-        if (pen) {
-          const count = this.dragons.countInPen(pen.id);
           const reach = this.player.withinReach(tx + 0.5, tz + 0.5);
-          if (reach && this._hasItem(selected) && count < BUILDINGS.dragonPen.maxDragons) {
-            prompt = `Press F / click to place ${sex} dragon baby (${count}/${BUILDINGS.dragonPen.maxDragons})`;
-            if (this.input.interactKey) {
-              const d = this.dragons.place(sex, pen, now);
-              if (d) {
-                this._consume(selected);
-                this.ui.toast(`Placed ${sex} dragon`);
-              }
-            }
-          } else if (count >= BUILDINGS.dragonPen.maxDragons) {
-            prompt = 'Pen is full';
+          const isBreed = pen.type === 'breedingPen';
+          if (isBreed && item.stage < 2) {
+            prompt = 'Breeding pens only accept adults';
+          } else if (!isBreed && item.stage >= 2) {
+            // Adults can go in regular pens too
+          }
+          const max = isBreed ? BUILDINGS.breedingPen.maxDragons : BUILDINGS.dragonPen.maxDragons;
+          const count = this.dragons.countInPen(pen.id);
+          if (isBreed && item.stage < 2) {
+            /* already prompted */
           } else if (!reach) prompt = 'Move closer';
-        } else {
-          prompt = 'Place dragons inside a dragon pen';
+          else if (count >= max) prompt = 'Pen is full';
+          else {
+            const label = `${item.rarity} ${DRAGONS.stages[item.stage].name} ${item.sex}`;
+            prompt = `Press F / click to place ${label}`;
+            if (this.input.interactKey) {
+              const d = this.dragons.place(item, pen, now);
+              if (d) {
+                this._consumeDragonItem(item);
+                this._spendEnergy(PLAYER.energyDrainAction);
+                this.ui.toast(`Placed ${label}`);
+              } else this.ui.toast('Cannot place here');
+            }
+          }
         }
       } else if (selected === 'dragonfruit') {
         const dragon = this.dragons.findNear(hit.x, hit.z, 2.5);
@@ -347,56 +523,100 @@ export class Game {
           const reach = this.player.withinReach(dragon.x, dragon.z);
           if (reach) {
             const stage = DRAGONS.stages[dragon.stage]?.name;
-            prompt =
-              stage === 'adult'
-                ? 'Dragon is already adult'
-                : 'Press F / click to feed dragonfruit';
+            prompt = stage === 'adult' ? 'Already adult' : 'Press F / click to feed';
             if (stage !== 'adult' && this.input.interactKey) {
               if (this.dragons.feed(dragon, now)) {
                 this._consume('dragonfruit');
+                this._spendEnergy(PLAYER.energyDrainAction);
                 this.ui.toast('Fed dragon — growth sped up!');
               }
             }
           }
-        } else {
-          prompt = 'Feed dragonfruit to a dragon in a pen';
-        }
+        } else prompt = 'Feed dragonfruit to a growing dragon';
       } else {
-        // Default interact: harvest crops
+        // Default: harvest, pick up adults, hatch eggs, rest already handled
         const info = this.crops.findAtWorld(tx, tz, this.buildings);
         if (info?.crop?.stage >= 4) {
           const reach = this.player.withinReach(tx + 0.5, tz + 0.5);
           if (reach) {
-            prompt = 'Press F / click to harvest dragonfruit';
+            prompt = 'Press F / click to harvest';
             if (this.input.interactKey) {
-              const yield_ = this.crops.harvest(info.plot.id, info.lx, info.lz);
-              if (yield_) {
-                this._add('dragonfruit', yield_.fruit);
-                this._add('seeds', yield_.seeds);
-                this.ui.toast(`Harvested +${yield_.fruit} fruit, +${yield_.seeds} seed`);
+              const y = this.crops.harvest(info.plot.id, info.lx, info.lz);
+              if (y) {
+                this._add('dragonfruit', y.fruit);
+                this._add('seeds', y.seeds);
+                this._spendEnergy(PLAYER.energyDrainAction);
+                this.ui.toast(`Harvested +${y.fruit} fruit, +${y.seeds} seed`);
               }
             }
           } else prompt = 'Move closer to harvest';
         }
 
-        // Hover dragons for tooltip
-        const dragon = this.dragons.findNear(hit.x, hit.z, 2.0);
+        // Hatch egg
+        const bp = this.buildings.findBreedingPenAt(tx, tz);
+        if (bp) {
+          const st = this.dragons.getBreedState(bp.id);
+          if (st?.egg) {
+            const reach = this.player.withinReach(bp.tx + bp.w / 2, bp.tz + bp.d / 2);
+            if (reach) {
+              const ready = now >= st.egg.hatchAt;
+              prompt = ready
+                ? 'Press F to hatch egg'
+                : `Egg hatching… (${st.egg.rarity}) — F to wait or auto`;
+              if (this.input.interactKey && ready) {
+                const egg = this.dragons.hatchEgg(bp.id, now, true);
+                if (egg) {
+                  st.cooldownUntil = now + BREEDING.cooldownMs;
+                  const item = makeDragonItem({ sex: egg.sex, stage: 0, rarity: egg.rarity });
+                  this._addDragonItem(item);
+                  const flair = egg.upgraded;
+                  this.ui.toast(
+                    flair
+                      ? `✨ HATCHED ${egg.rarity.toUpperCase()} ${egg.sex} baby! Upgrade!`
+                      : `Hatched ${egg.rarity} ${egg.sex} baby`,
+                    flair ? 3500 : 2200,
+                    flair
+                  );
+                  this._spendEnergy(PLAYER.energyDrainAction);
+                }
+              }
+            }
+          }
+        }
+
+        // Pick up adult dragon (into inventory)
+        const dragon = this.dragons.findNear(hit.x, hit.z, 2.2);
         if (dragon) {
           tooltip = this.ui.dragonTooltip(dragon);
+          if (!prompt) {
+            const reach = this.player.withinReach(dragon.x, dragon.z);
+            if (reach && dragon.stage >= 2) {
+              prompt = 'Press F to pick up adult dragon';
+              if (this.input.interactKey) {
+                const item = this.dragons.pickUp(dragon);
+                this._addDragonItem(item);
+                this._spendEnergy(PLAYER.energyDrainAction);
+                this.ui.toast(`Picked up ${item.rarity} adult ${item.sex}`);
+              }
+            } else if (reach && dragon.stage < 2) {
+              prompt = 'Grow to adult before moving to a breeding pen';
+            }
+          }
         }
       }
     } else {
       this.world.hideGrid();
     }
 
-    if (this.input.cancel && this.ui.selected) {
-      this.ui.select(null);
+    if (this.input.cancel) {
+      if (this.ui.dragonPanelOpen) this.ui.setDragonPanel(false);
+      else if (this.ui.selected) this.ui.select(null);
     }
 
     this.ui.setPrompt(prompt);
     this.ui.setTooltip(tooltip, this.input.clientX || 0, this.input.clientY || 0);
+    this.ui.setBreedHud(breedHud);
 
-    // Shadow follow player
     this.sun.position.set(
       this.player.position.x + 40,
       60,
@@ -405,7 +625,6 @@ export class Game {
     this.sun.target.position.copy(this.player.position);
     this.sun.target.updateMatrixWorld();
 
-    // Autosave
     this._autosaveAcc += dt;
     if (this._autosaveAcc > 8) {
       this._autosaveAcc = 0;
@@ -419,20 +638,17 @@ export class Game {
   _updateLighting() {
     const t = ((this.gameTime % DAY.lengthMs) + DAY.lengthMs) % DAY.lengthMs;
     const frac = t / DAY.lengthMs;
-    // Bright enough to play: night dips but not too dark
     let sunIntensity = 1.1;
     let hemiIntensity = 0.55;
     let ambIntensity = 0.25;
-    let bg = new THREE.Color(0x87b8e0);
+    const bg = new THREE.Color(0x87b8e0);
     if (frac < 0.2 || frac > 0.85) {
-      // night
       const night = frac < 0.2 ? (0.2 - frac) / 0.2 : (frac - 0.85) / 0.15;
       sunIntensity = 0.35 + (1 - night) * 0.3;
       hemiIntensity = 0.3;
       ambIntensity = 0.2;
       bg.set(0x1a2040).lerp(new THREE.Color(0x87b8e0), 1 - night * 0.7);
     } else if (frac < 0.3) {
-      // sunrise
       const k = (frac - 0.2) / 0.1;
       sunIntensity = 0.5 + k * 0.6;
       bg.set(0xff9966).lerp(new THREE.Color(0x87b8e0), k);
@@ -446,9 +662,6 @@ export class Game {
     this.amb.intensity = ambIntensity;
     this.scene.background.copy(bg);
     this.scene.fog.color.copy(bg);
-
-    const angle = (frac - 0.25) * Math.PI * 2;
-    this._sunAngle = angle;
   }
 }
 

@@ -326,11 +326,113 @@ export function createDragonPen() {
   return g;
 }
 
+
+/** 8x8 breeding pen — purple fence, nest/hay, sign. Adults only. */
+export function createBreedingPen() {
+  const g = new THREE.Group();
+  g.name = 'breedingPen';
+  const w = BUILDINGS.breedingPen.w;
+  const d = BUILDINGS.breedingPen.d;
+
+  const ground = new THREE.Mesh(
+    new THREE.BoxGeometry(w - 0.3, 0.08, d - 0.3),
+    new THREE.MeshStandardMaterial({ color: 0x6b4f7a, roughness: 1 })
+  );
+  ground.position.set(w / 2, 0.02, d / 2);
+  ground.receiveShadow = true;
+  g.add(ground);
+
+  const postMat = new THREE.MeshStandardMaterial({ color: 0x6a1b9a });
+  const railMat = new THREE.MeshStandardMaterial({ color: 0xab47bc });
+  const postH = 1.5;
+  const gateW = 1.6;
+
+  const addPost = (x, z) => {
+    const p = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, postH, 6), postMat);
+    p.position.set(x, postH / 2, z);
+    setShadow(p);
+    g.add(p);
+  };
+  const addRail = (x1, z1, x2, z2, y) => {
+    const dx = x2 - x1;
+    const dz = z2 - z1;
+    const len = Math.hypot(dx, dz);
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(len, 0.1, 0.08), railMat);
+    rail.position.set((x1 + x2) / 2, y, (z1 + z2) / 2);
+    rail.rotation.y = -Math.atan2(dz, dx);
+    g.add(rail);
+  };
+
+  for (let i = 0; i <= w; i++) {
+    addPost(i, 0);
+    addPost(i, d);
+  }
+  for (let j = 1; j < d; j++) {
+    addPost(0, j);
+    addPost(w, j);
+  }
+
+  const gateStart = (w - gateW) / 2;
+  const gateEnd = gateStart + gateW;
+  for (const y of [0.5, 1.0]) {
+    addRail(0, 0, gateStart, 0, y);
+    addRail(gateEnd, 0, w, 0, y);
+    addRail(0, d, w, d, y);
+    addRail(0, 0, 0, d, y);
+    addRail(w, 0, w, d, y);
+  }
+
+  const gate = new THREE.Mesh(
+    new THREE.BoxGeometry(gateW * 0.9, 1.1, 0.08),
+    new THREE.MeshStandardMaterial({ color: 0x4a148c })
+  );
+  gate.position.set(w / 2, 0.7, -0.05);
+  gate.rotation.y = 0.25;
+  g.add(gate);
+
+  // Hay / nest pile in center
+  const hayMat = new THREE.MeshStandardMaterial({ color: 0xd4a017, roughness: 1, flatShading: true });
+  const nest = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.3, 0.35, 10), hayMat);
+  nest.position.set(w / 2, 0.2, d / 2);
+  setShadow(nest);
+  g.add(nest);
+  const nestInner = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.7, 0.85, 0.2, 10),
+    new THREE.MeshStandardMaterial({ color: 0xb8860b, roughness: 1 })
+  );
+  nestInner.position.set(w / 2, 0.35, d / 2);
+  g.add(nestInner);
+
+  // Sign post
+  const signPost = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.06, 0.07, 1.8, 6),
+    new THREE.MeshStandardMaterial({ color: 0x5d4037 })
+  );
+  signPost.position.set(w / 2, 0.9, d + 0.3);
+  g.add(signPost);
+  const signBoard = new THREE.Mesh(
+    new THREE.BoxGeometry(1.4, 0.7, 0.1),
+    new THREE.MeshStandardMaterial({ color: 0xce93d8 })
+  );
+  signBoard.position.set(w / 2, 1.6, d + 0.3);
+  g.add(signBoard);
+  // Heart mark on sign
+  const heart = new THREE.Mesh(
+    new THREE.SphereGeometry(0.15, 6, 4),
+    new THREE.MeshStandardMaterial({ color: 0xe91e63 })
+  );
+  heart.position.set(w / 2, 1.6, d + 0.38);
+  g.add(heart);
+
+  return g;
+}
+
 export function createBuildingMesh(type) {
   switch (type) {
     case 'farmhouse': return createFarmhouse();
     case 'farmPlot': return createFarmPlot();
     case 'dragonPen': return createDragonPen();
+    case 'breedingPen': return createBreedingPen();
     default: throw new Error('Unknown building ' + type);
   }
 }
@@ -503,6 +605,33 @@ export class BuildingManager {
   findPenAt(tx, tz) {
     const b = this.findAt(tx, tz);
     return b && b.type === 'dragonPen' ? b : null;
+  }
+
+  findBreedingPenAt(tx, tz) {
+    const b = this.findAt(tx, tz);
+    return b && b.type === 'breedingPen' ? b : null;
+  }
+
+  findAnyPenAt(tx, tz) {
+    const b = this.findAt(tx, tz);
+    return b && (b.type === 'dragonPen' || b.type === 'breedingPen') ? b : null;
+  }
+
+  findFarmhouseNear(x, z, radius = 5) {
+    let best = null;
+    let bestDist = radius;
+    for (const b of this.buildings) {
+      if (b.type !== 'farmhouse') continue;
+      // Door is on south face center of footprint (before rotation approx — use footprint center south)
+      const doorX = b.tx + b.w / 2;
+      const doorZ = b.tz + 0.5;
+      const dist = Math.hypot(x - doorX, z - doorZ);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = b;
+      }
+    }
+    return best;
   }
 
   serialize() {

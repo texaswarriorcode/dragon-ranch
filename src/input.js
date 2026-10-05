@@ -13,7 +13,7 @@ export class Input {
       this.keys.add(k);
       this.justPressed.add(k);
       // prevent scrolling with arrows/space when focused
-      if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) {
+      if (['arrowup','arrowdown','arrowleft','arrowright',' ','tab'].includes(k)) {
         e.preventDefault();
       }
     });

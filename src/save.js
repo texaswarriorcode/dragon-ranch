@@ -1,29 +1,87 @@
-import { SAVE_KEY, STARTING } from './config.js';
+import { SAVE_KEY, SAVE_KEY_LEGACY, STARTING, PLAYER } from './config.js';
+
+let _id = 1;
+export function nextInvId() {
+  return _id++;
+}
+
+export function makeDragonItem({ sex, stage = 0, rarity = 'Common', id = null }) {
+  return { id: id ?? nextInvId(), sex, stage, rarity };
+}
 
 export function defaultInventory() {
+  const dragons = [];
+  for (let i = 0; i < STARTING.maleBabies; i++) {
+    dragons.push(makeDragonItem({ sex: 'male', stage: 0, rarity: 'Common' }));
+  }
+  for (let i = 0; i < STARTING.femaleBabies; i++) {
+    dragons.push(makeDragonItem({ sex: 'female', stage: 0, rarity: 'Common' }));
+  }
   return {
     seeds: STARTING.seeds,
     dragonfruit: STARTING.dragonfruit,
-    maleDragons: STARTING.maleDragons,
-    femaleDragons: STARTING.femaleDragons,
     farmhouses: STARTING.farmhouses,
     farmPlots: STARTING.farmPlots,
     dragonPens: STARTING.dragonPens,
+    breedingPens: STARTING.breedingPens,
+    dragons,
   };
+}
+
+export function migrateInventory(raw) {
+  if (!raw) return defaultInventory();
+  const base = defaultInventory();
+  const inv = {
+    seeds: raw.seeds ?? base.seeds,
+    dragonfruit: raw.dragonfruit ?? base.dragonfruit,
+    farmhouses: raw.farmhouses ?? base.farmhouses,
+    farmPlots: raw.farmPlots ?? base.farmPlots,
+    dragonPens: raw.dragonPens ?? base.dragonPens,
+    breedingPens: raw.breedingPens ?? base.breedingPens,
+    dragons: [],
+  };
+
+  if (Array.isArray(raw.dragons)) {
+    inv.dragons = raw.dragons.map((d) =>
+      makeDragonItem({
+        sex: d.sex,
+        stage: d.stage ?? 0,
+        rarity: d.rarity || 'Common',
+        id: d.id,
+      })
+    );
+  } else {
+    // Legacy v1 counts → Common babies
+    const males = raw.maleDragons ?? 0;
+    const females = raw.femaleDragons ?? 0;
+    for (let i = 0; i < males; i++) inv.dragons.push(makeDragonItem({ sex: 'male' }));
+    for (let i = 0; i < females; i++) inv.dragons.push(makeDragonItem({ sex: 'female' }));
+  }
+
+  // Keep id counter ahead
+  for (const d of inv.dragons) {
+    if (d.id >= _id) _id = d.id + 1;
+  }
+  return inv;
 }
 
 export function saveGame(state) {
   try {
     const data = {
-      version: 1,
+      version: 2,
       savedAt: Date.now(),
       inventory: state.inventory,
-      player: { x: state.player.position.x, z: state.player.position.z },
+      player: {
+        x: state.player.position.x,
+        z: state.player.position.z,
+        energy: state.energy,
+      },
       buildings: state.buildings.serialize(),
       crops: state.crops.serialize(),
       dragons: state.dragons.serialize(),
       gameTime: state.gameTime,
       creative: state.creative,
+      selectedDragonId: state.selectedDragonId,
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     return true;
@@ -35,9 +93,13 @@ export function saveGame(state) {
 
 export function loadGame() {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    let raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) raw = localStorage.getItem(SAVE_KEY_LEGACY);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const data = JSON.parse(raw);
+    data.inventory = migrateInventory(data.inventory);
+    if (data.player && data.player.energy == null) data.player.energy = PLAYER.energyMax;
+    return data;
   } catch (e) {
     console.warn('Load failed', e);
     return null;
@@ -46,4 +108,5 @@ export function loadGame() {
 
 export function clearSave() {
   localStorage.removeItem(SAVE_KEY);
+  localStorage.removeItem(SAVE_KEY_LEGACY);
 }

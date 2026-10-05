@@ -130,12 +130,18 @@ export class CropManager {
     return { plot, lx, lz, crop };
   }
 
+  advanceTime(ms) {
+    for (const c of this.crops.values()) {
+      c.stageStart -= ms;
+    }
+  }
+
   update(now) {
     const stageDurations = CROPS.stages.map((s) => s.duration);
     for (const c of this.crops.values()) {
-      if (c.stage >= 4) continue;
-      const dur = stageDurations[c.stage];
-      if (dur > 0 && now - c.stageStart >= dur) {
+      while (c.stage < 4) {
+        const dur = stageDurations[c.stage];
+        if (!(dur > 0 && now - c.stageStart >= dur)) break;
         c.stage += 1;
         c.stageStart = now;
         this.scene.remove(c.mesh);

@@ -1,7 +1,7 @@
 /** Central game timing and balance config — easy to tune for demos. */
 
 export const WORLD = {
-  size: 1000, // tiles (1 tile = 1 world unit)
+  size: 1000,
   half: 500,
 };
 
@@ -10,6 +10,12 @@ export const PLAYER = {
   reach: 8,
   height: 1.7,
   radius: 0.4,
+  energyMax: 100,
+  energyDrainPerSecMoving: 2.5,
+  energyDrainAction: 4,
+  energyRestRestore: 100,
+  lowEnergyThreshold: 25,
+  lowEnergySpeedMult: 0.55,
 };
 
 export const CAMERA = {
@@ -28,6 +34,7 @@ export const BUILDINGS = {
   farmhouse: { w: 6, d: 6, label: 'Farmhouse', color: 0xc4a574 },
   farmPlot: { w: 4, d: 4, label: 'Farm Plot', color: 0x6b4423 },
   dragonPen: { w: 8, d: 8, label: 'Dragon Pen', color: 0x8b7355, maxDragons: 4 },
+  breedingPen: { w: 8, d: 8, label: 'Breeding Pen', color: 0x9b59b6, maxDragons: 2 },
 };
 
 /** Crop growth in milliseconds (demo-tuned ~2–3 min to mature). */
@@ -39,7 +46,6 @@ export const CROPS = {
     { name: 'cactus', duration: 50_000 },
     { name: 'fruiting', duration: 40_000 },
   ],
-  // total ~165s ≈ 2.75 min
   harvestSeeds: 1,
   harvestFruit: 1,
 };
@@ -51,14 +57,75 @@ export const DRAGONS = {
     { name: 'juvenile', duration: 120_000, scale: 0.75 },
     { name: 'adult', duration: 0, scale: 1.15 },
   ],
-  // baby+juvenile = 210s ≈ 3.5 min; with feed boost ≈ faster to ~5 total feel
-  feedGrowthBoost: 0.5, // each feed removes 50% remaining stage time
+  feedGrowthBoost: 0.5,
   wanderSpeed: 1.2,
   maxPerPen: 4,
 };
 
+/**
+ * Rarity tiers (ascending). Upgrade only when BOTH parents share the same
+ * tier N and the roll succeeds — baby becomes N+1. Otherwise baby is the
+ * lower of the two parent tiers. Two Legendaries always stay Legendary.
+ */
+export const RARITY = {
+  tiers: [
+    'Common',
+    'Uncommon',
+    'Rare',
+    'Very Rare',
+    'Super Rare',
+    'Epic',
+    'Exceptional',
+    'Legendary',
+  ],
+  /** Chance to upgrade when both parents are this tier (key = parent tier). */
+  upgradeChance: {
+    Common: 0.8,
+    Uncommon: 0.65,
+    Rare: 0.5,
+    'Very Rare': 0.35,
+    'Super Rare': 0.22,
+    Epic: 0.12,
+    Exceptional: 0.05,
+    Legendary: 0, // always Legendary; no higher tier
+  },
+  colors: {
+    Common: 0x9e9e9e,
+    Uncommon: 0x4caf50,
+    Rare: 0x2196f3,
+    'Very Rare': 0x9c27b0,
+    'Super Rare': 0xe91e63,
+    Epic: 0xff9800,
+    Exceptional: 0xf44336,
+    Legendary: 0xffd700,
+  },
+  cssColors: {
+    Common: '#9e9e9e',
+    Uncommon: '#4caf50',
+    Rare: '#2196f3',
+    'Very Rare': '#9c27b0',
+    'Super Rare': '#e91e63',
+    Epic: '#ff9800',
+    Exceptional: '#f44336',
+    Legendary: '#ffd700',
+  },
+};
+
+export const BREEDING = {
+  breedDurationMs: 60_000,
+  hatchDurationMs: 15_000,
+  cooldownMs: 45_000,
+  maxAdults: 2,
+};
+
+export const REST = {
+  fadeMs: 700,
+  skipHoursIfDay: 4, // in-game hours (~ DAY.lengthMs / 24 * 4)
+  morningFrac: 0.28, // wake around morning
+};
+
 export const DAY = {
-  lengthMs: 8 * 60_000, // 8 real minutes = 1 game day
+  lengthMs: 8 * 60_000,
   sunrise: 0.22,
   sunset: 0.78,
 };
@@ -66,11 +133,14 @@ export const DAY = {
 export const STARTING = {
   seeds: 20,
   dragonfruit: 5,
-  maleDragons: 2,
-  femaleDragons: 2,
+  // Baby Common dragons (migrated from old male/female counts)
+  maleBabies: 2,
+  femaleBabies: 2,
   farmhouses: 99,
   farmPlots: 99,
   dragonPens: 99,
+  breedingPens: 99,
 };
 
-export const SAVE_KEY = 'dragon-ranch-save-v1';
+export const SAVE_KEY = 'dragon-ranch-save-v2';
+export const SAVE_KEY_LEGACY = 'dragon-ranch-save-v1';
