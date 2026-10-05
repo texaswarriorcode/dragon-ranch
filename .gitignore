@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+
+# Local / editor
+.DS_Store
+*.local
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Screenshots kept in repo for verification — do not ignore
+# screenshots/
+
+# Env
+.env
+.env.*
