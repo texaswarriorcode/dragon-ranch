@@ -533,3 +533,89 @@ button.ui-btn.active { outline: 2px solid #9fe070; }
 .hotbar .slot {
   width: 58px;
 }
+
+/* —— Missions panel —— */
+.mission-panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(440px, 92vw);
+  max-height: 80vh;
+  overflow: auto;
+  z-index: 40;
+  padding: 14px 16px 16px;
+  background: rgba(18, 28, 20, 0.94);
+  border: 1px solid rgba(160, 200, 140, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+}
+.mission-panel.hidden { display: none; }
+.mission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.mission-header h3 { margin: 0; font-size: 16px; color: #e8f0e0; }
+.mission-step-label {
+  font-size: 11px;
+  color: #9fe070;
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.mission-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #c5d6b8;
+  margin-bottom: 10px;
+}
+.mission-field.dim { opacity: 0.45; }
+.mission-field select {
+  background: rgba(0,0,0,0.45);
+  color: #e8f0e0;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 6px;
+  padding: 7px 8px;
+  font-size: 13px;
+}
+.mission-desc {
+  font-size: 12px;
+  color: #a8b898;
+  margin: 4px 0 10px;
+  line-height: 1.4;
+}
+.mission-meta { color: #ffe082; font-size: 11px; }
+.mission-start { width: 100%; margin-top: 4px; }
+.mission-start:disabled { opacity: 0.5; cursor: default; }
+.mission-active {
+  margin-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 10px;
+}
+.mission-active h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #b0c4a0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.mission-row {
+  background: rgba(0,0,0,0.28);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #e0e8d8;
+}
+.mission-eta {
+  font-size: 11px;
+  color: #90caf9;
+  margin: 2px 0 4px;
+}
+.hotbar .slot {
+  width: 52px;
+}

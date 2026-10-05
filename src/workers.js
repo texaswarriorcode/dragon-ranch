@@ -46,6 +46,23 @@ export class WorkerManager {
     return this.workers.length;
   }
 
+  findNear(x, z, radius = 2.2) {
+    let best = null;
+    let bestD = radius;
+    for (const w of this.workers) {
+      const d = Math.hypot(w.x - x, w.z - z);
+      if (d < bestD) {
+        bestD = d;
+        best = w;
+      }
+    }
+    return best;
+  }
+
+  getById(id) {
+    return this.workers.find((w) => w.id === id) || null;
+  }
+
   hire(typeId, bunkhouse, now) {
     const def = WORKERS.types[typeId];
     if (!def || !bunkhouse) return null;
@@ -89,6 +106,7 @@ export class WorkerManager {
     );
 
     for (const w of this.workers) {
+      if (w.busyMission) continue; // away on mission — stay put / hidden handled by game
       const bunk = bunkById.get(w.bunkhouseId);
       w.roamTimer -= dt;
       if (w.roamTimer <= 0 || !w.roamTarget) {

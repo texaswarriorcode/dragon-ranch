@@ -31,17 +31,18 @@ node scripts/test-breeding-odds.mjs
 | **Q** / **E** (hold) | Rotate camera |
 | **RMB drag** | Orbit |
 | **Scroll** | Zoom |
-| **1–8** | Hotbar |
+| **1–9** | Hotbar |
 | **LMB** / **F** | Interact / place |
 | **R** | Rotate building ghost |
 | **Esc** | Cancel / close panel |
 | **I** / **Tab** | Dragon inventory |
 | **M** | Marketplace |
+| **N** | Missions panel |
 
 ### Hotbar
 
 1. Farmhouse · 2. Farm plot · 3. Dragon pen · 4. Breeding pen  
-5. Worker bunkhouse · 6. Seeds · 7. Dragons · 8. Dragonfruit
+5. Worker bunkhouse · 6. Field Training (6×6) · 7. Seeds · 8. Dragons · 9. Dragonfruit
 
 ## Features
 
@@ -58,7 +59,7 @@ node scripts/test-breeding-odds.mjs
 
 ## Marketplace
 
-Open with **M** or the **Marketplace** button. Tabs: Farm Plots, Dragons, Dragon Buildings, Farm Workers, Farm Buildings.
+Open with **M** or the **Marketplace** button. Tabs: Farm Plots, Dragons, Dragon Buildings, Farm Workers, Farm Buildings, **Dragon Development**.
 
 Starting coins: **200**. Buy **Dragon Handler** (50) under Farm Workers (needs free bunk) and **Worker Bunkhouse** (75, 4×10, holds 4 workers) under Farm Buildings.
 
@@ -71,6 +72,17 @@ Common L1 base: **HP 100 / Def 5 / Atk 10**. Adults earn **XP** (100 to reach L2
 ```bash
 npm run test:stats
 ```
+
+## Field missions
+
+**Dragon Field Training** (6×6 ruined arch + dirt ring) is sold under Marketplace → Dragon Development (100 coins) and placed with hotbar **6**. Open **Missions** (**N**, help button, or **F** near a Dragon Handler):
+
+1. Select a free Dragon Handler  
+2. Select an adult dragon (inventory or pen; not on mission / not resting)  
+3. Select a placed Field Training structure  
+4. Choose a mission and **Start**
+
+First mission **Take Dragon For A Run**: 5 min → **+100 XP** to the dragon and **+20 coins**; then the dragon rests **10 min** before another mission. Progress and rest timers persist in save (`MISSIONS` in `src/config.js`).
 
 ## Creative mode
 

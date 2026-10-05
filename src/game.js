@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {
   DAY, BUILDINGS, DRAGONS, PLAYER, BREEDING, REST, RARITY,
-  ECONOMY, DRAGON_STATS,
+  ECONOMY, DRAGON_STATS, MISSIONS,
 } from './config.js';
 import { World } from './world.js';
 import { Player } from './player.js';
@@ -11,6 +11,7 @@ import { BuildingManager, footprintFor } from './buildings.js';
 import { CropManager, createCropMesh } from './crops.js';
 import { DragonManager, createDragonMesh, createEggMesh } from './dragons.js';
 import { WorkerManager } from './workers.js';
+import { MissionManager, getMissionDef, missionsForBuildingType } from './missions.js';
 import { UI } from './ui.js';
 import {
   saveGame, loadGame, clearSave, defaultInventory, makeDragonItem, nextInvId,
@@ -19,7 +20,7 @@ import { rollBreedingResult, rarityCss } from './rarity.js';
 import { grantDragonXp } from './stats.js';
 import { tryPurchase } from './marketplace/marketplace.js';
 
-const BUILD_TYPES = new Set(['farmhouse', 'farmPlot', 'dragonPen', 'breedingPen', 'workerBunkhouse']);
+const BUILD_TYPES = new Set(['farmhouse', 'farmPlot', 'dragonPen', 'breedingPen', 'workerBunkhouse', 'dragonFieldTraining']);
 
 export class Game {
   constructor(canvas, uiRoot) {
@@ -71,6 +72,7 @@ export class Game {
     this.crops = new CropManager(this.scene);
     this.dragons = new DragonManager(this.scene);
     this.workers = new WorkerManager(this.scene);
+    this.missions = new MissionManager();
     this.ui = new UI(uiRoot);
     this.ui.coins = this.coins;
     this.ui.updateCoins(this.coins);
@@ -89,6 +91,8 @@ export class Game {
       this.ui.toast(`Spawned ${opts.rarity} ${opts.sex} ${DRAGONS.stages[opts.stage].name}`);
     };
     this.ui.onPurchase = (listing) => this._purchase(listing);
+    this.ui.onGetMissionOptions = () => this._missionOptions();
+    this.ui.onStartMission = (sel) => this._startMission(sel);
 
     this.ui.onToggleCreative = () => {
       this.creative = !this.creative;
@@ -100,6 +104,7 @@ export class Game {
         this.inventory.dragonPens = 999;
         this.inventory.breedingPens = 999;
         this.inventory.workerBunkhouses = 999;
+        this.inventory.fieldTrainings = 999;
         this.coins = 99999;
         this.ui.updateCoins(this.coins);
         // Seed a few rarities for testing if empty of non-common
@@ -215,6 +220,10 @@ export class Game {
       this.inventory.workerBunkhouses = Math.max(0, (this.inventory.workerBunkhouses ?? 99) - 1);
       this.workers.hire('dragonHandler', bunk, now);
     }
+    const train = this.buildings.place('dragonFieldTraining', -8, 10, 0);
+    if (train) {
+      this.inventory.fieldTrainings = Math.max(0, (this.inventory.fieldTrainings ?? 99) - 1);
+    }
     this.coins = ECONOMY.startingCoins;
     this.ui.updateCoins(this.coins);
     this._refreshHud();
@@ -235,6 +244,8 @@ export class Game {
     this.crops.deserialize(data.crops || [], this.buildings, now);
     this.dragons.deserialize(data.dragons || [], now, this.buildings);
     this.workers.deserialize(data.workers || []);
+    this.missions.deserialize(data.missions || []);
+    this._syncWorkerMissionBusy();
     this.ui.setCreativeVisible(this.creative);
     this.ui.updateCoins(this.coins);
     this._refreshHud();
@@ -266,6 +277,7 @@ export class Game {
       dragonPen: 'dragonPens',
       breedingPen: 'breedingPens',
       workerBunkhouse: 'workerBunkhouses',
+      dragonFieldTraining: 'fieldTrainings',
       seeds: 'seeds',
       dragonfruit: 'dragonfruit',
     };
@@ -380,6 +392,12 @@ export class Game {
     if (this.input.pressed('m')) {
       this.ui.setMarketplace(!this.ui.marketplaceOpen);
     }
+    if (this.input.pressed('n')) {
+      this.ui.setMissions(!this.ui.missionsOpen);
+    }
+
+    this.missions.tick(Date.now(), (mission, def) => this._onMissionComplete(mission, def));
+    if (this.ui.missionsOpen) this.ui.renderMissions();
 
     // Energy drain while moving
     const speedMult =
@@ -405,6 +423,9 @@ export class Game {
     this.crops.update(now);
     this.dragons.update(now, dt, this.buildings);
     this.workers.update(dt, this.buildings);
+    for (const w of this.workers.workers) {
+      if (w.mesh) w.mesh.visible = !w.busyMission;
+    }
     this.dragons.tickAdultIdleXp(dt, (d, amt) => this._grantXpToDragon(d, amt, false), DRAGON_STATS.xp.idlePerSec);
     this.dragons.tickBreeding(
       now,
@@ -430,13 +451,28 @@ export class Game {
     let tooltip = '';
     let breedHud = '';
 
+    // Click/near Dragon Handler → missions
+    const nearWorker = this.workers.findNear(
+      this.player.position.x,
+      this.player.position.z,
+      3.2
+    );
+    if (nearWorker && !nearWorker.busyMission && !this.ui.selected) {
+      prompt = 'Press F to assign missions';
+      if (this.input.interactKey) {
+        this.ui.setMissions(true, { workerId: nearWorker.id });
+        this.input.endFrame();
+        return;
+      }
+    }
+
     // Rest at farmhouse door
     const nearHouse = this.buildings.findFarmhouseNear(
       this.player.position.x,
       this.player.position.z,
       4.5
     );
-    if (nearHouse && !this.ui.selected) {
+    if (nearHouse && !this.ui.selected && !nearWorker) {
       prompt = 'Press F to rest';
       if (this.input.interactKey) {
         this._doRest();
@@ -715,6 +751,12 @@ export class Game {
     const cap = this.buildings.bunkCapacity();
     this.inventory._workersLabel = `Workers: <b>${used}/${cap || 0}</b>`;
     this.inventory._coins = this.coins;
+    const now = Date.now();
+    for (const d of this.inventory.dragons) {
+      const left = this.missions.dragonRestRemaining(d, now);
+      d._restLabel = left > 0 ? `Resting ${this.missions.formatRemaining(left)}` : '';
+      d._away = false;
+    }
     this.ui.updateCoins(this.coins);
     this.ui.updateInventory(this.inventory, this.selectedDragonId);
   }
@@ -775,5 +817,179 @@ export class Game {
     return result;
   }
 
-}
 
+  _syncWorkerMissionBusy() {
+    const busy = new Set(this.missions.active.map((m) => m.workerId));
+    for (const w of this.workers.workers) {
+      w.busyMission = busy.has(w.id);
+      if (w.mesh) w.mesh.visible = !w.busyMission;
+    }
+  }
+
+  _missionOptions() {
+    const now = Date.now();
+    const workers = this.workers.workers
+      .filter((w) => !w.busyMission)
+      .map((w) => ({
+        id: w.id,
+        label: `${w.name || 'Handler'} #${w.id}`,
+      }));
+
+    const dragons = [];
+    const seen = new Set();
+    for (const d of this.inventory.dragons) {
+      if ((d.stage ?? 0) < 2) continue;
+      if (this.missions.isDragonOnMission(d.id)) continue;
+      if (this.missions.isDragonResting(d, now)) continue;
+      seen.add(d.id);
+      const stage = DRAGONS.stages[d.stage]?.name || 'adult';
+      dragons.push({
+        id: d.id,
+        label: `${d.rarity} ${stage} ${d.sex === 'male' ? '♂' : '♀'} (inv) · Lv${d.level ?? 1}`,
+        source: 'inventory',
+      });
+    }
+    for (const d of this.dragons.dragons) {
+      if ((d.stage ?? 0) < 2) continue;
+      if (seen.has(d.id)) continue;
+      if (this.missions.isDragonOnMission(d.id)) continue;
+      if (this.missions.isDragonResting(d, now)) continue;
+      const stage = DRAGONS.stages[d.stage]?.name || 'adult';
+      dragons.push({
+        id: d.id,
+        label: `${d.rarity} ${stage} ${d.sex === 'male' ? '♂' : '♀'} (pen) · Lv${d.level ?? 1}`,
+        source: 'world',
+      });
+    }
+
+    const buildings = this.buildings.buildings
+      .filter((b) => b.type === 'dragonFieldTraining')
+      .map((b) => ({
+        id: b.id,
+        label: `Field Training #${b.id} (${b.w}×${b.d})`,
+        type: b.type,
+      }));
+
+    const missionsByBuilding = {};
+    for (const b of buildings) {
+      missionsByBuilding[b.id] = missionsForBuildingType(b.type).map((m) => ({
+        id: m.id,
+        label: m.name,
+        description: m.description,
+        meta: `+${m.rewards.xp} XP · +${m.rewards.coins} coins · ${Math.round(m.durationMs / 60000)} min · rest ${Math.round(m.restMs / 60000)} min`,
+      }));
+    }
+
+    const active = this.missions.active.map((m) => {
+      const prog = this.missions.progress(m, now);
+      const def = getMissionDef(m.missionKey);
+      const d = m.dragon;
+      return {
+        title: def?.name || m.missionKey,
+        subtitle: `${d.rarity} ${d.sex} Lv${d.level} · Away on mission`,
+        eta: this.missions.formatRemaining(prog.remainingMs),
+        ratio: prog.ratio,
+      };
+    });
+
+    const resting = [];
+    for (const d of this.inventory.dragons) {
+      const left = this.missions.dragonRestRemaining(d, now);
+      if (left > 0) {
+        resting.push({
+          label: `${d.rarity} ${d.sex} Lv${d.level ?? 1}`,
+          eta: this.missions.formatRemaining(left),
+        });
+      }
+    }
+    for (const d of this.dragons.dragons) {
+      const left = this.missions.dragonRestRemaining(d, now);
+      if (left > 0) {
+        resting.push({
+          label: `${d.rarity} ${d.sex} Lv${d.level ?? 1} (pen)`,
+          eta: this.missions.formatRemaining(left),
+        });
+      }
+    }
+
+    return { workers, dragons, buildings, missionsByBuilding, active, resting };
+  }
+
+  _startMission(sel) {
+    const workerId = Number(sel.workerId);
+    const dragonId = Number(sel.dragonId);
+    const buildingId = Number(sel.buildingId);
+    const missionKey = sel.missionKey;
+    const worker = this.workers.getById(workerId);
+    if (!worker) return { ok: false, message: 'Select a Dragon Handler' };
+    if (worker.busyMission) return { ok: false, message: 'Handler already on a mission' };
+
+    const building = this.buildings.buildings.find((b) => b.id === buildingId);
+    if (!building || building.type !== 'dragonFieldTraining') {
+      return { ok: false, message: 'Select a Dragon Field Training structure' };
+    }
+
+    let dragon = this.inventory.dragons.find((d) => d.id === dragonId);
+    if (!dragon) {
+      const world = this.dragons.dragons.find((d) => d.id === dragonId);
+      if (!world) return { ok: false, message: 'Dragon not found' };
+      dragon = this.dragons.pickUp(world);
+    } else {
+      this.inventory.dragons = this.inventory.dragons.filter((d) => d.id !== dragon.id);
+      if (this.selectedDragonId === dragon.id) {
+        this.selectedDragonId = this.inventory.dragons[0]?.id ?? null;
+      }
+    }
+
+    const result = this.missions.start({
+      workerId: worker.id,
+      buildingId: building.id,
+      buildingType: building.type,
+      dragon,
+      missionKey,
+    });
+    if (!result.ok) {
+      this.inventory.dragons.push(dragon);
+      this._refreshHud();
+      return result;
+    }
+
+    worker.busyMission = true;
+    if (worker.mesh) worker.mesh.visible = false;
+    this._refreshHud();
+    return { ok: true, message: `Sent ${dragon.rarity} dragon on ${result.def.name}` };
+  }
+
+  _onMissionComplete(mission, def) {
+    const rewards = def?.rewards || { xp: 0, coins: 0 };
+    const dragon = { ...mission.dragon };
+    const xpResult = grantDragonXp(dragon, rewards.xp || 0);
+    dragon.missionRestUntil = Date.now() + (def?.restMs || 0);
+    this.inventory.dragons.push(
+      makeDragonItem({
+        sex: dragon.sex,
+        stage: dragon.stage,
+        rarity: dragon.rarity,
+        level: dragon.level,
+        xp: dragon.xp,
+        id: dragon.id,
+        missionRestUntil: dragon.missionRestUntil,
+      })
+    );
+    this.coins += rewards.coins || 0;
+    const worker = this.workers.getById(mission.workerId);
+    if (worker) {
+      worker.busyMission = false;
+      if (worker.mesh) worker.mesh.visible = true;
+    }
+    const lvlNote = xpResult.leveled > 0 ? ` · leveled to ${dragon.level}!` : '';
+    this.ui.toast(
+      `Mission complete! +${rewards.xp} XP · +${rewards.coins} coins${lvlNote}`,
+      4000,
+      true
+    );
+    this._refreshHud();
+    if (this.ui.missionsOpen) this.ui.renderMissions();
+  }
+
+}

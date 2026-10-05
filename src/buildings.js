@@ -535,6 +535,93 @@ export function createWorkerBunkhouse() {
   return g;
 }
 
+
+/** Dragon Field Training — 6×6 ruined stone arch + dirt ring. */
+export function createDragonFieldTraining() {
+  const g = new THREE.Group();
+  g.name = 'dragonFieldTraining';
+  const w = BUILDINGS.dragonFieldTraining.w;
+  const d = BUILDINGS.dragonFieldTraining.d;
+  const stone = new THREE.MeshStandardMaterial({ color: 0x8a9199, roughness: 0.9, flatShading: true });
+  const stoneDark = new THREE.MeshStandardMaterial({ color: 0x5c636a, roughness: 0.92, flatShading: true });
+  const dirt = new THREE.MeshStandardMaterial({ color: 0x8d6e4c, roughness: 1 });
+  const moss = new THREE.MeshStandardMaterial({ color: 0x556b2f, roughness: 1 });
+
+  // Dirt training ring (flattened torus-ish: disk + outer rim)
+  const pad = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 2.6, 0.08, 24), dirt);
+  pad.position.set(w / 2, 0.04, d / 2);
+  pad.receiveShadow = true;
+  g.add(pad);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(2.55, 0.12, 6, 28), moss);
+  rim.rotation.x = Math.PI / 2;
+  rim.position.set(w / 2, 0.1, d / 2);
+  g.add(rim);
+
+  // Pillar helper
+  const addPillar = (x, z, h, lean = 0) => {
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.55, h, 0.55), stone);
+    p.position.set(x, h / 2, z);
+    p.rotation.z = lean;
+    p.castShadow = true;
+    g.add(p);
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.2, 0.75), stoneDark);
+    cap.position.set(x + Math.sin(lean) * h * 0.5, h + 0.05, z);
+    g.add(cap);
+  };
+
+  // Two standing pillars + cracked arch
+  const px = w / 2;
+  const pz = d / 2 - 0.4;
+  addPillar(px - 1.4, pz, 2.8, -0.04);
+  addPillar(px + 1.4, pz, 2.6, 0.06);
+
+  // Broken arch (two wedges meeting imperfectly)
+  const archL = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.4, 0.5), stone);
+  archL.position.set(px - 0.7, 3.05, pz);
+  archL.rotation.z = 0.35;
+  g.add(archL);
+  const archR = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.38, 0.5), stoneDark);
+  archR.position.set(px + 0.75, 2.95, pz);
+  archR.rotation.z = -0.4;
+  g.add(archR);
+  // Keystone crack / gap piece hanging
+  const key = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.35, 0.45), stone);
+  key.position.set(px + 0.1, 3.25, pz);
+  key.rotation.z = 0.15;
+  g.add(key);
+
+  // Fallen pillar stump + rubble
+  const stump = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.6), stoneDark);
+  stump.position.set(px - 2.2, 0.35, pz + 1.8);
+  stump.rotation.z = 0.5;
+  stump.rotation.y = 0.4;
+  g.add(stump);
+  const fallen = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 2.2), stone);
+  fallen.position.set(px + 1.8, 0.28, pz + 1.6);
+  fallen.rotation.z = Math.PI / 2;
+  fallen.rotation.y = 0.5;
+  g.add(fallen);
+  for (const [sx, sz, s] of [
+    [px - 1.8, pz + 2.2, 0.35],
+    [px + 0.5, pz + 2.4, 0.28],
+    [px + 2.0, pz + 0.8, 0.4],
+    [px - 2.4, pz - 1.5, 0.3],
+  ]) {
+    const rock = new THREE.Mesh(new THREE.BoxGeometry(s, s * 0.7, s * 0.9), Math.random() > 0.5 ? stone : stoneDark);
+    rock.position.set(sx, s * 0.35, sz);
+    rock.rotation.y = sx + sz;
+    g.add(rock);
+  }
+
+  // Small broken wall remnant behind arch
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.1, 0.35), stoneDark);
+  wall.position.set(px, 0.55, pz - 1.8);
+  wall.rotation.y = 0.08;
+  g.add(wall);
+
+  return g;
+}
+
 export function createBuildingMesh(type) {
   switch (type) {
     case 'farmhouse': return createFarmhouse();
@@ -542,6 +629,7 @@ export function createBuildingMesh(type) {
     case 'dragonPen': return createDragonPen();
     case 'breedingPen': return createBreedingPen();
     case 'workerBunkhouse': return createWorkerBunkhouse();
+    case 'dragonFieldTraining': return createDragonFieldTraining();
     default: throw new Error('Unknown building ' + type);
   }
 }

@@ -37,6 +37,8 @@ export const BUILDINGS = {
   breedingPen: { w: 8, d: 8, label: 'Breeding Pen', color: 0x9b59b6, maxDragons: 2 },
   /** Footprint 4 wide × 10 long; R rotates to 10×4. */
   workerBunkhouse: { w: 4, d: 10, label: 'Worker Bunkhouse', color: 0x8d6e63, capacity: 4 },
+  /** Footprint 6×6; R rotates (square). Ruined training arch + ring. */
+  dragonFieldTraining: { w: 6, d: 6, label: 'Dragon Field Training', color: 0x78909c },
 };
 
 /** Crop growth in milliseconds (demo-tuned ~2–3 min to mature). */
@@ -182,6 +184,24 @@ export const DAY = {
   sunset: 0.78,
 };
 
+export const MISSIONS = {
+  /** Buildings that host missions (type → mission keys). */
+  buildings: {
+    dragonFieldTraining: ['takeDragonForARun'],
+  },
+  defs: {
+    takeDragonForARun: {
+      id: 'takeDragonForARun',
+      name: 'Take Dragon For A Run',
+      description: 'Send a handler and adult dragon on a training jog around the field.',
+      durationMs: 5 * 60_000,
+      restMs: 10 * 60_000,
+      rewards: { xp: 100, coins: 20 },
+      buildingType: 'dragonFieldTraining',
+    },
+  },
+};
+
 export const STARTING = {
   seeds: 20,
   dragonfruit: 5,
@@ -193,6 +213,7 @@ export const STARTING = {
   dragonPens: 99,
   breedingPens: 99,
   workerBunkhouses: 99,
+  fieldTrainings: 99,
 };
 
 export const SAVE_KEY = 'dragon-ranch-save-v2';

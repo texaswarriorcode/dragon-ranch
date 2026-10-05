@@ -10,9 +10,10 @@ const HOTBAR_ITEMS = [
   { id: 'dragonPen', label: 'Pen', inv: 'dragonPens', color: '#8b7355', key: '3' },
   { id: 'breedingPen', label: 'Breed', inv: 'breedingPens', color: '#9b59b6', key: '4' },
   { id: 'workerBunkhouse', label: 'Bunks', inv: 'workerBunkhouses', color: '#8d6e63', key: '5' },
-  { id: 'seeds', label: 'Seeds', inv: 'seeds', color: '#7cb342', key: '6' },
-  { id: 'dragons', label: 'Dragons', inv: 'dragons', color: '#c62828', key: '7' },
-  { id: 'dragonfruit', label: 'Fruit', inv: 'dragonfruit', color: '#e91e8c', key: '8' },
+  { id: 'dragonFieldTraining', label: 'Train', inv: 'fieldTrainings', color: '#78909c', key: '6' },
+  { id: 'seeds', label: 'Seeds', inv: 'seeds', color: '#7cb342', key: '7' },
+  { id: 'dragons', label: 'Dragons', inv: 'dragons', color: '#c62828', key: '8' },
+  { id: 'dragonfruit', label: 'Fruit', inv: 'dragonfruit', color: '#e91e8c', key: '9' },
 ];
 
 export class UI {
@@ -22,14 +23,18 @@ export class UI {
     this.selectedDragonId = null;
     this.dragonPanelOpen = false;
     this.marketplaceOpen = false;
+    this.missionsOpen = false;
     this.marketplaceTab = MARKETPLACE_TABS[0].id;
-    this.coins = 0; // stub currency display — economy wired later
+    this.coins = 0;
     this.onSelect = null;
     this.onNewGame = null;
     this.onToggleCreative = null;
     this.onSelectDragon = null;
     this.onCreativeSpawn = null;
     this.onPurchase = null; // (listing) => result from game
+    this.onStartMission = null; // (payload) => result
+    this.onGetMissionOptions = null; // () => options snapshot
+    this.missionSel = { workerId: '', dragonId: '', buildingId: '', missionKey: '' };
 
     root.innerHTML = `
       <div class="hud-top">
@@ -41,11 +46,12 @@ export class UI {
         <div class="panel help-panel" id="help-panel">
           <h3>Controls</h3>
           <div><kbd>WASD</kbd> move · <kbd>Q</kbd>/<kbd>E</kbd> cam · scroll zoom · RMB orbit</div>
-          <div><kbd>1-8</kbd> hotbar · <kbd>R</kbd> rotate · <kbd>Esc</kbd> cancel · <kbd>F</kbd>/click interact</div>
-          <div><kbd>I</kbd> / <kbd>Tab</kbd> dragon inventory · <kbd>M</kbd> marketplace · rest at door</div>
+          <div><kbd>1-9</kbd> hotbar · <kbd>R</kbd> rotate · <kbd>Esc</kbd> cancel · <kbd>F</kbd>/click interact</div>
+          <div><kbd>I</kbd>/<kbd>Tab</kbd> dragons · <kbd>M</kbd> market · <kbd>N</kbd> missions · rest at door</div>
           <div style="margin-top:6px" class="btn-row">
             <button class="ui-btn" id="btn-help-hide">Hide help</button>
             <button class="ui-btn" id="btn-market">Marketplace</button>
+            <button class="ui-btn" id="btn-missions">Missions</button>
             <button class="ui-btn" id="btn-creative">Creative</button>
             <button class="ui-btn danger" id="btn-new">New game</button>
           </div>
@@ -80,6 +86,14 @@ export class UI {
         <div class="market-tabs" id="market-tabs"></div>
         <div class="market-body" id="market-body"></div>
       </div>
+      <div class="mission-panel hidden" id="mission-panel">
+        <div class="mission-header">
+          <h3>Field Missions</h3>
+          <button class="ui-btn" id="btn-mission-close">Close</button>
+        </div>
+        <div class="mission-steps" id="mission-steps"></div>
+        <div class="mission-active" id="mission-active"></div>
+      </div>
     `;
 
     this.hotbarEl = root.querySelector('#hotbar');
@@ -101,6 +115,9 @@ export class UI {
     this.marketTabs = root.querySelector('#market-tabs');
     this.marketBody = root.querySelector('#market-body');
     this.coinsDisplay = root.querySelector('#coins-display');
+    this.missionPanel = root.querySelector('#mission-panel');
+    this.missionSteps = root.querySelector('#mission-steps');
+    this.missionActive = root.querySelector('#mission-active');
 
     this._buildHotbar();
     this._buildCreativeSpawn();
@@ -120,6 +137,8 @@ export class UI {
     root.querySelector('#btn-dragon-close').addEventListener('click', () => this.setDragonPanel(false));
     root.querySelector('#btn-market').addEventListener('click', () => this.setMarketplace(!this.marketplaceOpen));
     root.querySelector('#btn-market-close').addEventListener('click', () => this.setMarketplace(false));
+    root.querySelector('#btn-missions').addEventListener('click', () => this.setMissions(!this.missionsOpen));
+    root.querySelector('#btn-mission-close').addEventListener('click', () => this.setMissions(false));
   }
 
   _buildHotbar() {
@@ -199,7 +218,10 @@ export class UI {
   setDragonPanel(open) {
     this.dragonPanelOpen = open;
     this.dragonPanel.classList.toggle('hidden', !open);
-    if (open) this.setMarketplace(false);
+    if (open) {
+      this.setMarketplace(false);
+      this.setMissions(false);
+    }
   }
 
   updateDragonList(dragons, selectedId) {
@@ -216,12 +238,15 @@ export class UI {
       const stats = computeDragonStats(d.rarity || 'Common', d.level ?? 1);
       const xp = xpProgress(d);
       const xpPct = Math.floor(xp.ratio * 100);
+      const away = d._away ? '<span class="di-stats" style="color:#ffcc80">Away on mission</span>' : '';
+      const rest = d._restLabel ? `<span class="di-stats" style="color:#90caf9">${d._restLabel}</span>` : '';
       el.innerHTML = `
         <span class="rarity-pip" style="background:${rarityCss(d.rarity)}"></span>
         <span class="di-main">${d.sex === 'male' ? '♂' : '♀'} ${stage}
           <span class="di-stats">${formatStatsLine(stats)}</span>
           <span class="xp-bar"><i style="width:${xpPct}%"></i></span>
           <span class="di-stats">${formatXpLine(d)}</span>
+          ${away}${rest}
         </span>
         <span class="di-rarity" style="color:${rarityCss(d.rarity)}">${d.rarity}</span>
       `;
@@ -409,10 +434,154 @@ export class UI {
     this.marketPanel.classList.toggle('hidden', !open);
     if (open) {
       this.setDragonPanel(false);
+      this.setMissions(false);
       this.updateCoins(this.coins);
       this._buildMarketTabs();
       this._renderMarketBody();
     }
+  }
+
+  setMissions(open, opts = {}) {
+    this.missionsOpen = open;
+    this.missionPanel.classList.toggle('hidden', !open);
+    if (open) {
+      this.setDragonPanel(false);
+      this.setMarketplace(false);
+      if (opts.workerId != null) this.missionSel.workerId = String(opts.workerId);
+      this.renderMissions();
+    }
+  }
+
+  renderMissions() {
+    const data = this.onGetMissionOptions?.() || {
+      workers: [],
+      dragons: [],
+      buildings: [],
+      missions: [],
+      active: [],
+    };
+    const sel = this.missionSel;
+
+    // Validate cascading selections
+    if (sel.workerId && !data.workers.some((w) => String(w.id) === String(sel.workerId))) {
+      sel.workerId = '';
+    }
+    if (!sel.workerId) {
+      sel.dragonId = '';
+      sel.buildingId = '';
+      sel.missionKey = '';
+    }
+    const dragons = sel.workerId ? data.dragons : [];
+    if (sel.dragonId && !dragons.some((d) => String(d.id) === String(sel.dragonId))) {
+      sel.dragonId = '';
+    }
+    if (!sel.dragonId) {
+      sel.buildingId = '';
+      sel.missionKey = '';
+    }
+    const buildings = sel.dragonId ? data.buildings : [];
+    if (sel.buildingId && !buildings.some((b) => String(b.id) === String(sel.buildingId))) {
+      sel.buildingId = '';
+    }
+    if (!sel.buildingId) sel.missionKey = '';
+    const missions = sel.buildingId
+      ? (data.missionsByBuilding?.[sel.buildingId] || data.missions || [])
+      : [];
+    if (sel.missionKey && !missions.some((m) => m.id === sel.missionKey)) {
+      sel.missionKey = '';
+    }
+
+    const mkOpts = (list, value, labelFn, placeholder) => {
+      let html = `<option value="">${placeholder}</option>`;
+      for (const item of list) {
+        const v = String(item.id);
+        const selected = String(value) === v ? ' selected' : '';
+        html += `<option value="${v}"${selected}>${labelFn(item)}</option>`;
+      }
+      return html;
+    };
+
+    const step = !sel.workerId ? 1 : !sel.dragonId ? 2 : !sel.buildingId ? 3 : 4;
+    let html = `<div class="mission-step-label">Step ${step} of 4</div>`;
+
+    html += `<label class="mission-field">1. Dragon Handler
+      <select id="ms-worker">${mkOpts(data.workers, sel.workerId, (w) => w.label, 'Select handler…')}</select>
+    </label>`;
+
+    html += `<label class="mission-field${sel.workerId ? '' : ' dim'}">2. Adult dragon
+      <select id="ms-dragon" ${sel.workerId ? '' : 'disabled'}>${mkOpts(dragons, sel.dragonId, (d) => d.label, sel.workerId ? 'Select dragon…' : 'Pick a handler first')}</select>
+    </label>`;
+
+    html += `<label class="mission-field${sel.dragonId ? '' : ' dim'}">3. Training structure
+      <select id="ms-building" ${sel.dragonId ? '' : 'disabled'}>${mkOpts(buildings, sel.buildingId, (b) => b.label, sel.dragonId ? 'Select Field Training…' : 'Pick a dragon first')}</select>
+    </label>`;
+
+    html += `<label class="mission-field${sel.buildingId ? '' : ' dim'}">4. Mission
+      <select id="ms-mission" ${sel.buildingId ? '' : 'disabled'}>${mkOpts(missions, sel.missionKey, (m) => m.label, sel.buildingId ? 'Select mission…' : 'Pick a structure first')}</select>
+    </label>`;
+
+    const canStart = sel.workerId && sel.dragonId && sel.buildingId && sel.missionKey;
+    const picked = missions.find((m) => m.id === sel.missionKey);
+    if (picked) {
+      html += `<div class="mission-desc">${picked.description || ''}<br><span class="mission-meta">${picked.meta || ''}</span></div>`;
+    }
+    html += `<button class="ui-btn mission-start" id="ms-start" ${canStart ? '' : 'disabled'}>Start mission</button>`;
+
+    this.missionSteps.innerHTML = html;
+
+    const bind = (id, key) => {
+      const el = this.missionSteps.querySelector(id);
+      el?.addEventListener('change', () => {
+        this.missionSel[key] = el.value;
+        // reset downstream
+        if (key === 'workerId') {
+          this.missionSel.dragonId = '';
+          this.missionSel.buildingId = '';
+          this.missionSel.missionKey = '';
+        } else if (key === 'dragonId') {
+          this.missionSel.buildingId = '';
+          this.missionSel.missionKey = '';
+        } else if (key === 'buildingId') {
+          this.missionSel.missionKey = '';
+        }
+        this.renderMissions();
+      });
+    };
+    bind('#ms-worker', 'workerId');
+    bind('#ms-dragon', 'dragonId');
+    bind('#ms-building', 'buildingId');
+    bind('#ms-mission', 'missionKey');
+    this.missionSteps.querySelector('#ms-start')?.addEventListener('click', () => {
+      const result = this.onStartMission?.({ ...this.missionSel });
+      if (result?.message) this.toast(result.message, result.ok ? 2800 : 2500, !!result.ok);
+      if (result?.ok) {
+        this.missionSel.dragonId = '';
+        this.missionSel.missionKey = '';
+        this.renderMissions();
+      }
+    });
+
+    // Active missions list
+    let act = '<h4>Active / Away</h4>';
+    if (!data.active?.length) {
+      act += '<div class="empty">No dragons on mission</div>';
+    } else {
+      for (const a of data.active) {
+        const pct = Math.floor((a.ratio || 0) * 100);
+        act += `<div class="mission-row">
+          <div><b>${a.title}</b><br><span class="di-stats">${a.subtitle || ''}</span></div>
+          <div class="mission-eta">${a.eta}</div>
+          <div class="xp-bar" style="max-width:100%"><i style="width:${pct}%"></i></div>
+        </div>`;
+      }
+    }
+    if (data.resting?.length) {
+      act += '<h4>Resting</h4>';
+      for (const r of data.resting) {
+        act += `<div class="mission-row"><div>${r.label}</div><div class="mission-eta">${r.eta}</div></div>`;
+      }
+    }
+    this.missionActive.innerHTML = act;
   }
 
   updateCoins(n) {
@@ -424,6 +593,10 @@ export class UI {
 
   /** Close topmost modal panel. Returns true if something was closed. */
   closeTopPanel() {
+    if (this.missionsOpen) {
+      this.setMissions(false);
+      return true;
+    }
     if (this.marketplaceOpen) {
       this.setMarketplace(false);
       return true;

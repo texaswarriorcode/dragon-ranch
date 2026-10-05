@@ -225,6 +225,7 @@ export class DragonManager {
       rarity,
       level,
       xp: stage >= 2 ? xp : 0,
+      missionRestUntil: opts.missionRestUntil || 0,
       mesh,
       x,
       z,
@@ -245,6 +246,7 @@ export class DragonManager {
       rarity: normalizeRarity(dragon.rarity),
       level: dragon.level ?? 1,
       xp: dragon.xp ?? 0,
+      missionRestUntil: dragon.missionRestUntil || 0,
     };
     this.scene.remove(dragon.mesh);
     this.dragons = this.dragons.filter((d) => d.id !== dragon.id);
@@ -473,6 +475,7 @@ export class DragonManager {
         rarity: normalizeRarity(d.rarity),
         level: d.level ?? 1,
         xp: d.xp ?? 0,
+        missionRestUntil: d.missionRestUntil || 0,
         x: d.x,
         z: d.z,
       })),
@@ -522,6 +525,7 @@ export class DragonManager {
         rarity,
         level: raw.level ?? 1,
         xp: raw.xp ?? 0,
+        missionRestUntil: raw.missionRestUntil || 0,
         mesh,
         x: raw.x,
         z: raw.z,

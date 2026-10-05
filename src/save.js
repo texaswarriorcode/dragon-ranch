@@ -5,7 +5,7 @@ export function nextInvId() {
   return _id++;
 }
 
-export function makeDragonItem({ sex, stage = 0, rarity = 'Common', level = 1, xp = 0, id = null }) {
+export function makeDragonItem({ sex, stage = 0, rarity = 'Common', level = 1, xp = 0, id = null, missionRestUntil = 0 }) {
   return {
     id: id ?? nextInvId(),
     sex,
@@ -13,6 +13,7 @@ export function makeDragonItem({ sex, stage = 0, rarity = 'Common', level = 1, x
     rarity,
     level: Math.max(1, Math.floor(level) || 1),
     xp: Math.max(0, xp || 0),
+    missionRestUntil: missionRestUntil || 0,
   };
 }
 
@@ -32,6 +33,7 @@ export function defaultInventory() {
     dragonPens: STARTING.dragonPens,
     breedingPens: STARTING.breedingPens,
     workerBunkhouses: STARTING.workerBunkhouses ?? 99,
+    fieldTrainings: STARTING.fieldTrainings ?? 99,
     dragons,
   };
 }
@@ -47,6 +49,7 @@ export function migrateInventory(raw) {
     dragonPens: raw.dragonPens ?? base.dragonPens,
     breedingPens: raw.breedingPens ?? base.breedingPens,
     workerBunkhouses: raw.workerBunkhouses ?? base.workerBunkhouses,
+    fieldTrainings: raw.fieldTrainings ?? base.fieldTrainings,
     dragons: [],
   };
 
@@ -59,6 +62,7 @@ export function migrateInventory(raw) {
         level: d.level ?? 1,
         xp: d.xp ?? 0,
         id: d.id,
+        missionRestUntil: d.missionRestUntil ?? 0,
       })
     );
   } else {
@@ -95,6 +99,7 @@ export function saveGame(state) {
       selectedDragonId: state.selectedDragonId,
       coins: state.coins,
       workers: state.workers?.serialize?.() ?? state.workers ?? [],
+      missions: state.missions?.serialize?.() ?? [],
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     return true;

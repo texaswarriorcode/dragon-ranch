@@ -6,7 +6,7 @@
  *     grant?: { kind: 'building'|'worker', key: string, count?: number } }
  */
 
-/** @typedef {'farmPlots'|'dragons'|'dragonBuildings'|'farmWorkers'|'farmBuildings'} MarketCategory */
+/** @typedef {'farmPlots'|'dragons'|'dragonBuildings'|'farmWorkers'|'farmBuildings'|'dragonDevelopment'} MarketCategory */
 
 /** @type {{ id: MarketCategory, label: string }[]} */
 export const MARKETPLACE_TABS = [
@@ -15,6 +15,7 @@ export const MARKETPLACE_TABS = [
   { id: 'dragonBuildings', label: 'Dragon Buildings' },
   { id: 'farmWorkers', label: 'Farm Workers' },
   { id: 'farmBuildings', label: 'Farm Buildings' },
+  { id: 'dragonDevelopment', label: 'Dragon Development' },
 ];
 
 function stubs(prefix, n = 2) {
@@ -51,6 +52,17 @@ export const MARKETPLACE_CATALOG = {
       grant: { kind: 'building', key: 'workerBunkhouses', count: 1 },
     },
     ...stubs('farmBuildings', 2),
+  ],
+  dragonDevelopment: [
+    {
+      id: 'bld-dragon-field-training',
+      name: 'Dragon Field Training',
+      description:
+        'Ruined stone archway and dirt training ring (6×6). Place it, then send a Dragon Handler + adult on missions (hotbar 9 or Missions panel).',
+      price: 100,
+      grant: { kind: 'building', key: 'fieldTrainings', count: 1 },
+    },
+    ...stubs('dragonDevelopment', 2),
   ],
 };
 
