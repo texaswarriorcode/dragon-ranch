@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { DRAGONS, BUILDINGS, RARITY } from './config.js';
 import { rarityColor, normalizeRarity } from './rarity.js';
+import { nextInvId, reserveInvId } from './save.js';
 
 /**
  * Low-poly red dragon. sex: 'male' | 'female'
@@ -216,7 +217,8 @@ export class DragonManager {
     mesh.position.set(x, 0, z);
     this.scene.add(mesh);
     const d = {
-      id: opts.id ?? this.nextId++,
+      // Shared ID space with inventory items so a dragon keeps one unique ID everywhere
+      id: opts.id ?? nextInvId(),
       sex,
       stage,
       stageStart: now,
@@ -233,6 +235,7 @@ export class DragonManager {
       roamTimer: 0,
     };
     this.nextId = Math.max(this.nextId, d.id + 1);
+    reserveInvId(d.id);
     this.dragons.push(d);
     return d;
   }
@@ -298,7 +301,8 @@ export class DragonManager {
         if (!stageDef || stageDef.duration <= 0) break;
         if (now - d.stageStart < stageDef.duration) break;
         d.stage = Math.min(d.stage + 1, DRAGONS.stages.length - 1);
-        d.stageStart = now;
+        // Carry leftover time into the next stage (a long rest can grow more than one stage)
+        d.stageStart += stageDef.duration;
         const { name, pos, rot } = rebuildDragonMesh(d);
         this.scene.remove(d.mesh);
         d.mesh = createDragonMesh(d.sex, name, d.rarity);

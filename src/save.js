@@ -5,6 +5,11 @@ export function nextInvId() {
   return _id++;
 }
 
+/** Make sure future IDs are above `id` (used after loading pen / mission dragons). */
+export function reserveInvId(id) {
+  if (Number.isFinite(id) && id >= _id) _id = id + 1;
+}
+
 export function makeDragonItem({ sex, stage = 0, rarity = 'Common', level = 1, xp = 0, id = null, missionRestUntil = 0 }) {
   return {
     id: id ?? nextInvId(),

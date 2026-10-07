@@ -143,7 +143,8 @@ export class CropManager {
         const dur = stageDurations[c.stage];
         if (!(dur > 0 && now - c.stageStart >= dur)) break;
         c.stage += 1;
-        c.stageStart = now;
+        // Carry leftover time so a long time skip (rest) can advance several stages
+        c.stageStart += dur;
         this.scene.remove(c.mesh);
         c.mesh = createCropMesh(c.stage);
         c.mesh.position.set(c.worldX, 0.1, c.worldZ);

@@ -14,7 +14,7 @@ import { WorkerManager } from './workers.js';
 import { MissionManager, getMissionDef, missionsForBuildingType } from './missions.js';
 import { UI } from './ui.js';
 import {
-  saveGame, loadGame, clearSave, defaultInventory, makeDragonItem, nextInvId,
+  saveGame, loadGame, clearSave, defaultInventory, makeDragonItem, nextInvId, reserveInvId,
 } from './save.js';
 import { rollBreedingResult, rarityCss } from './rarity.js';
 import { grantDragonXp } from './stats.js';
@@ -127,6 +127,10 @@ export class Game {
     };
 
     window.addEventListener('resize', () => this._onResize());
+    // Save when the tab is closed / reloaded / hidden so nothing since the last autosave is lost
+    const flush = () => { if (!this._resting) saveGame(this); };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
 
     const params = new URLSearchParams(location.search);
     if (params.get('demo') === '1') this._loadDemo();
@@ -248,6 +252,24 @@ export class Game {
     this.dragons.deserialize(data.dragons || [], now, this.buildings);
     this.workers.deserialize(data.workers || []);
     this.missions.deserialize(data.missions || []);
+    // Dragon IDs share one counter: keep it above pen + mission dragons too, not just inventory,
+    // otherwise new dragons reuse a pen dragon's ID and placing one deletes its twin.
+    for (const d of this.dragons.dragons) reserveInvId(d.id);
+    for (const m of this.missions.active) reserveInvId(m.dragon?.id);
+    // Old saves spawned handlers inside the bunkhouse walls — move them out to the door.
+    for (const w of this.workers.workers) {
+      const inside = this.buildings.getObstacles().find(
+        (o) => w.x > o.minX && w.x < o.maxX && w.z > o.minZ && w.z < o.maxZ
+      );
+      if (inside) {
+        const bunk = this.buildings.buildings.find((b) => b.id === w.bunkhouseId);
+        if (bunk) {
+          const door = this.buildings.doorPoint(bunk, 1.2);
+          w.x = door.x; w.z = door.z;
+          w.mesh.position.set(w.x, 0, w.z);
+        }
+      }
+    }
     this._syncWorkerMissionBusy();
     this.ui.setCreativeVisible(this.creative);
     this.ui.updateCoins(this.coins);
@@ -749,7 +771,8 @@ export class Game {
     this.sun.target.position.copy(this.player.position);
     this.sun.target.updateMatrixWorld();
 
-    this._autosaveAcc += dt;
+    // Real seconds (dt is clamped to 50ms, so game-time autosave stretched out at low FPS)
+    this._autosaveAcc += this.timer.getDelta();
     if (this._autosaveAcc > 8) {
       this._autosaveAcc = 0;
       saveGame(this);
@@ -839,6 +862,7 @@ export class Game {
     if (result.ok) {
       if (result.coins != null) this.coins = result.coins;
       this._refreshHud();
+      saveGame(this);
     }
     return result;
   }
@@ -1008,6 +1032,7 @@ export class Game {
     worker.busyMission = true;
     if (worker.mesh) worker.mesh.visible = false;
     this._refreshHud();
+    saveGame(this);
     return { ok: true, message: `Sent ${dragon.rarity} dragon on ${result.def.name}` };
   }
 
@@ -1041,6 +1066,7 @@ export class Game {
       true
     );
     this._refreshHud();
+    saveGame(this);
     if (this.ui.missionsOpen) this.ui.renderMissions();
   }
 
