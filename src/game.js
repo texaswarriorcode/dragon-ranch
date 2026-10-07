@@ -373,9 +373,16 @@ export class Game {
     const now = performance.now();
     this.gameTime += dt * 1000;
 
+    // Esc closes the top panel first (and only that); otherwise it cancels the selection below.
+    if (this.input.cancel && this.ui.closeTopPanel()) {
+      this.input.justPressed.delete('escape');
+    }
+    // Marketplace / Missions are modal-ish: hotbar keys shouldn't change the build tool behind them.
+    const modalOpen = this.ui.marketplaceOpen || this.ui.missionsOpen;
+
     // Hotbar + inventory panel keys
     for (const item of this.ui.hotbarItems) {
-      if (this.input.pressed(item.key)) {
+      if (!modalOpen && this.input.pressed(item.key)) {
         if (item.id === 'dragons') {
           this.ui.setDragonPanel(!this.ui.dragonPanelOpen);
           this.ui.select('dragons');
@@ -397,7 +404,15 @@ export class Game {
     }
 
     this.missions.tick(Date.now(), (mission, def) => this._onMissionComplete(mission, def));
-    if (this.ui.missionsOpen) this.ui.renderMissions();
+    // Refresh the Missions panel a few times per second without rebuilding the dropdowns
+    // (rebuilding every frame closed open <select>s and swallowed clicks on "Start mission").
+    if (this.ui.missionsOpen) {
+      this._missionRefreshAcc = (this._missionRefreshAcc || 0) + dt;
+      if (this._missionRefreshAcc > 0.25) {
+        this._missionRefreshAcc = 0;
+        this.ui.refreshMissions();
+      }
+    }
 
     // Energy drain while moving
     const speedMult =
@@ -451,17 +466,33 @@ export class Game {
     let tooltip = '';
     let breedHud = '';
 
-    // Click/near Dragon Handler → missions
+    // Is the cursor on something the default (no tool) interaction would act on?
+    // Then F / click should do that instead of opening Missions / resting.
+    let aimActionable = false;
+    if (hit && !this.ui.selected) {
+      const { tx: atx, tz: atz } = this.world.tileFromWorld(hit.x, hit.z);
+      const info = this.crops.findAtWorld(atx, atz, this.buildings);
+      if (info?.crop?.stage >= 4 && this.player.withinReach(atx + 0.5, atz + 0.5)) aimActionable = true;
+      const dAim = this.dragons.findNear(hit.x, hit.z, 2.2);
+      if (dAim && dAim.stage >= 2 && this.player.withinReach(dAim.x, dAim.z)) aimActionable = true;
+      const bpAim = this.buildings.findBreedingPenAt(atx, atz);
+      if (bpAim && this.dragons.getBreedState(bpAim.id)?.egg) aimActionable = true;
+    }
+    const fPressed = this.input.pressed('f');
+    const clicked = this.input.leftClick;
+
+    // Near a Dragon Handler → missions (F nearby, or click on the handler)
     const nearWorker = this.workers.findNear(
       this.player.position.x,
       this.player.position.z,
       3.2
     );
-    if (nearWorker && !nearWorker.busyMission && !this.ui.selected) {
+    if (nearWorker && !nearWorker.busyMission && !this.ui.selected && !aimActionable) {
       prompt = 'Press F to assign missions';
-      if (this.input.interactKey) {
+      const clickedWorker = clicked && hit && Math.hypot(hit.x - nearWorker.x, hit.z - nearWorker.z) < 1.3;
+      if (fPressed || clickedWorker) {
         this.ui.setMissions(true, { workerId: nearWorker.id });
-        this.input.endFrame();
+        this._finishFrame(prompt, tooltip, breedHud);
         return;
       }
     }
@@ -472,11 +503,14 @@ export class Game {
       this.player.position.z,
       4.5
     );
-    if (nearHouse && !this.ui.selected && !nearWorker) {
+    if (nearHouse && !this.ui.selected && !nearWorker && !aimActionable) {
       prompt = 'Press F to rest';
-      if (this.input.interactKey) {
+      const clickedHouse = clicked && hit &&
+        hit.x > nearHouse.tx - 0.5 && hit.x < nearHouse.tx + nearHouse.w + 0.5 &&
+        hit.z > nearHouse.tz - 0.5 && hit.z < nearHouse.tz + nearHouse.d + 0.5;
+      if (fPressed || clickedHouse) {
         this._doRest();
-        this.input.endFrame();
+        this._finishFrame(prompt, tooltip, breedHud);
         return;
       }
     }
@@ -689,11 +723,7 @@ export class Game {
       this.world.hideGrid();
     }
 
-    if (this.input.cancel) {
-      if (!this.ui.closeTopPanel()) {
-        if (this.ui.selected) this.ui.select(null);
-      }
-    }
+    if (this.input.cancel && this.ui.selected) this.ui.select(null);
 
     this.ui.setPrompt(prompt);
     this.ui.setTooltip(tooltip, this.input.clientX || 0, this.input.clientY || 0);
@@ -713,6 +743,15 @@ export class Game {
       saveGame(this);
     }
 
+    this.renderer.render(this.scene, this.camera);
+    this.input.endFrame();
+  }
+
+  /** Early-exit path of _frame: still update HUD and render so the frame isn't dropped. */
+  _finishFrame(prompt, tooltip, breedHud) {
+    this.ui.setPrompt(prompt);
+    this.ui.setTooltip(tooltip, this.input.clientX || 0, this.input.clientY || 0);
+    this.ui.setBreedHud(breedHud);
     this.renderer.render(this.scene, this.camera);
     this.input.endFrame();
   }

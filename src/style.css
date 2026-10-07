@@ -24,7 +24,9 @@ html, body, #app {
   z-index: 10;
 }
 
-#ui-root > * { pointer-events: auto; }
+/* :where() keeps specificity at 0 so overlays that declare pointer-events:none
+   (fade, prompt, toast, tooltip, breed HUD, hud-top strip) don't swallow canvas input. */
+:where(#ui-root) > * { pointer-events: auto; }
 
 .hud-top {
   position: absolute;
@@ -619,3 +621,6 @@ button.ui-btn.active { outline: 2px solid #9fe070; }
 .hotbar .slot {
   width: 52px;
 }
+
+/* Marketplace overlaps the help card on ~1280px screens */
+#ui-root.market-open .help-panel { visibility: hidden; }

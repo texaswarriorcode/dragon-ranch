@@ -432,6 +432,8 @@ export class UI {
   setMarketplace(open) {
     this.marketplaceOpen = open;
     this.marketPanel.classList.toggle('hidden', !open);
+    // The 720px market panel covers the help card on 1280px screens — hide help meanwhile.
+    this.root.classList.toggle('market-open', open);
     if (open) {
       this.setDragonPanel(false);
       this.setMissions(false);
@@ -452,7 +454,12 @@ export class UI {
     }
   }
 
-  renderMissions() {
+  /** Called ~4x/s by the game: only touches the DOM when something actually changed. */
+  refreshMissions() {
+    this.renderMissions(false);
+  }
+
+  renderMissions(force = true) {
     const data = this.onGetMissionOptions?.() || {
       workers: [],
       dragons: [],
@@ -527,7 +534,43 @@ export class UI {
     }
     html += `<button class="ui-btn mission-start" id="ms-start" ${canStart ? '' : 'disabled'}>Start mission</button>`;
 
-    this.missionSteps.innerHTML = html;
+    // Rebuilding the <select>s closes an open dropdown and eats clicks, so only rebuild when the
+    // content changed — and never underneath a dropdown the player is using (unless forced).
+    const active = document.activeElement;
+    const focusedInside = active && active !== document.body && this.missionSteps.contains(active);
+    if (force || (html !== this._missionStepsHtml && !focusedInside)) {
+      this._missionStepsHtml = html;
+      this.missionSteps.innerHTML = html;
+      this._bindMissionSteps();
+    }
+
+    // Active missions list
+    let act = '<h4>Active / Away</h4>';
+    if (!data.active?.length) {
+      act += '<div class="empty">No dragons on mission</div>';
+    } else {
+      for (const a of data.active) {
+        const pct = Math.floor((a.ratio || 0) * 100);
+        act += `<div class="mission-row">
+          <div><b>${a.title}</b><br><span class="di-stats">${a.subtitle || ''}</span></div>
+          <div class="mission-eta">${a.eta}</div>
+          <div class="xp-bar" style="max-width:100%"><i style="width:${pct}%"></i></div>
+        </div>`;
+      }
+    }
+    if (data.resting?.length) {
+      act += '<h4>Resting</h4>';
+      for (const r of data.resting) {
+        act += `<div class="mission-row"><div>${r.label}</div><div class="mission-eta">${r.eta}</div></div>`;
+      }
+    }
+    if (act !== this._missionActiveHtml) {
+      this._missionActiveHtml = act;
+      this.missionActive.innerHTML = act;
+    }
+  }
+
+  _bindMissionSteps() {
 
     const bind = (id, key) => {
       const el = this.missionSteps.querySelector(id);
@@ -561,27 +604,6 @@ export class UI {
       }
     });
 
-    // Active missions list
-    let act = '<h4>Active / Away</h4>';
-    if (!data.active?.length) {
-      act += '<div class="empty">No dragons on mission</div>';
-    } else {
-      for (const a of data.active) {
-        const pct = Math.floor((a.ratio || 0) * 100);
-        act += `<div class="mission-row">
-          <div><b>${a.title}</b><br><span class="di-stats">${a.subtitle || ''}</span></div>
-          <div class="mission-eta">${a.eta}</div>
-          <div class="xp-bar" style="max-width:100%"><i style="width:${pct}%"></i></div>
-        </div>`;
-      }
-    }
-    if (data.resting?.length) {
-      act += '<h4>Resting</h4>';
-      for (const r of data.resting) {
-        act += `<div class="mission-row"><div>${r.label}</div><div class="mission-eta">${r.eta}</div></div>`;
-      }
-    }
-    this.missionActive.innerHTML = act;
   }
 
   updateCoins(n) {

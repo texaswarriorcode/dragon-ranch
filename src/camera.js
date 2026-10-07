@@ -39,9 +39,11 @@ export class FollowCamera {
     });
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
+      // Exponential zoom: each 100px wheel notch scales distance by ~12%.
+      const dy = Math.max(-300, Math.min(300, e.deltaY));
       this.distance = Math.max(
         CAMERA.minDistance,
-        Math.min(CAMERA.maxDistance, this.distance + e.deltaY * CAMERA.zoomSpeed * 0.05)
+        Math.min(CAMERA.maxDistance, this.distance * Math.exp(dy * CAMERA.zoomSpeed * 0.015))
       );
     }, { passive: false });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
