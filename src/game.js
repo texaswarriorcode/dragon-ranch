@@ -21,6 +21,8 @@ import { grantDragonXp } from './stats.js';
 import { tryPurchase } from './marketplace/marketplace.js';
 
 const BUILD_TYPES = new Set(['farmhouse', 'farmPlot', 'dragonPen', 'breedingPen', 'workerBunkhouse', 'dragonFieldTraining']);
+// Structures the player collides with — can't be placed on top of the player.
+const SOLID_BUILDINGS = new Set(['farmhouse', 'workerBunkhouse', 'dragonFieldTraining']);
 
 export class Game {
   constructor(canvas, uiRoot) {
@@ -548,10 +550,16 @@ export class Game {
           const gtx = tx - Math.floor(w / 2);
           const gtz = tz - Math.floor(d / 2);
           const inReach = this.player.withinReach(gtx + w / 2, gtz + d / 2);
+          const pp = this.player.position;
+          const pr = this.player.radius;
+          const onPlayer =
+            SOLID_BUILDINGS.has(selected) &&
+            pp.x + pr > gtx && pp.x - pr < gtx + w && pp.z + pr > gtz && pp.z - pr < gtz + d;
           const valid =
             this._hasItem(selected) &&
             this.buildings.canPlace(selected, gtx, gtz, this.buildings.ghostRot) &&
-            inReach;
+            inReach &&
+            !onPlayer;
           this.buildings.updateGhost(gtx, gtz, valid);
           prompt = valid
             ? `Click / F to place ${BUILDINGS[selected].label}`
@@ -559,7 +567,9 @@ export class Game {
               ? 'Too far away'
               : !this._hasItem(selected)
                 ? 'None left'
-                : 'Cannot place here';
+                : onPlayer
+                  ? 'You are standing there — step aside'
+                  : 'Cannot place here';
           if (valid && this.input.interactKey) {
             const placed = this.buildings.place(selected, gtx, gtz, this.buildings.ghostRot);
             if (placed) {

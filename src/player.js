@@ -23,6 +23,14 @@ function makeAvatar() {
   head.castShadow = true;
   g.add(head);
 
+  // Eyes on the +z face (the avatar's forward) so facing direction reads at a glance
+  const eyeMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
+  for (const ex of [-0.08, 0.08]) {
+    const eye = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.02), eyeMat);
+    eye.position.set(ex, 1.54, 0.195);
+    g.add(eye);
+  }
+
   // Hat brim
   const hat = new THREE.Mesh(
     new THREE.CylinderGeometry(0.28, 0.28, 0.12, 8),
@@ -99,8 +107,11 @@ export class Player {
       const tryZ = pos.z + wish.z;
       const r = this.radius;
 
-      if (!this._hitsAny(tryX, pos.z, r, collisions)) pos.x = tryX;
-      if (!this._hitsAny(pos.x, tryZ, r, collisions)) pos.z = tryZ;
+      // Colliders we already overlap (e.g. something was placed on top of us) are ignored
+      // so the player can always walk out instead of being stuck forever.
+      const blocking = collisions.filter((c) => !this._overlaps(pos.x, pos.z, r, c));
+      if (!this._hitsAny(tryX, pos.z, r, blocking)) pos.x = tryX;
+      if (!this._hitsAny(pos.x, tryZ, r, blocking)) pos.z = tryZ;
 
       world.clampPosition(pos, 1.5);
 
@@ -108,27 +119,24 @@ export class Player {
       this.mesh.rotation.y = this.facing;
 
       this.walkPhase += dt * 10;
-      this._animateWalk(true);
+      this._animateWalk(true, dt);
     } else {
-      this._animateWalk(false);
+      this._animateWalk(false, dt);
     }
+  }
+
+  _overlaps(x, z, r, c) {
+    return x + r > c.minX && x - r < c.maxX && z + r > c.minZ && z - r < c.maxZ;
   }
 
   _hitsAny(x, z, r, collisions) {
     for (const c of collisions) {
-      if (
-        x + r > c.minX &&
-        x - r < c.maxX &&
-        z + r > c.minZ &&
-        z - r < c.maxZ
-      ) {
-        return true;
-      }
+      if (this._overlaps(x, z, r, c)) return true;
     }
     return false;
   }
 
-  _animateWalk(walking) {
+  _animateWalk(walking, dt = 1 / 60) {
     const { legL, legR, armL, armR, body } = this.mesh.userData.parts;
     if (walking) {
       const s = Math.sin(this.walkPhase);
@@ -138,10 +146,11 @@ export class Player {
       armR.rotation.x = s * 0.4;
       body.position.y = 0.95 + Math.abs(s) * 0.04;
     } else {
-      legL.rotation.x *= 0.8;
-      legR.rotation.x *= 0.8;
-      armL.rotation.x *= 0.8;
-      armR.rotation.x *= 0.8;
+      const k = Math.pow(0.8, dt * 60); // same settle speed at any frame rate
+      legL.rotation.x *= k;
+      legR.rotation.x *= k;
+      armL.rotation.x *= k;
+      armR.rotation.x *= k;
       body.position.y = 0.95;
     }
   }

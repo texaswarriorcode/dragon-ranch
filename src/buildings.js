@@ -563,6 +563,7 @@ export function createDragonFieldTraining() {
     p.position.set(x, h / 2, z);
     p.rotation.z = lean;
     p.castShadow = true;
+    p.userData.solid = true;
     g.add(p);
     const cap = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.2, 0.75), stoneDark);
     cap.position.set(x + Math.sin(lean) * h * 0.5, h + 0.05, z);
@@ -595,11 +596,13 @@ export function createDragonFieldTraining() {
   stump.position.set(px - 2.2, 0.35, pz + 1.8);
   stump.rotation.z = 0.5;
   stump.rotation.y = 0.4;
+  stump.userData.solid = true;
   g.add(stump);
   const fallen = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 2.2), stone);
   fallen.position.set(px + 1.8, 0.28, pz + 1.6);
   fallen.rotation.z = Math.PI / 2;
   fallen.rotation.y = 0.5;
+  fallen.userData.solid = true;
   g.add(fallen);
   for (const [sx, sz, s] of [
     [px - 1.8, pz + 2.2, 0.35],
@@ -617,6 +620,7 @@ export function createDragonFieldTraining() {
   const wall = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.1, 0.35), stoneDark);
   wall.position.set(px, 0.55, pz - 1.8);
   wall.rotation.y = 0.08;
+  wall.userData.solid = true;
   g.add(wall);
 
   return g;
@@ -676,16 +680,52 @@ export class BuildingManager {
     this.ghostRot = 0;
   }
 
+  /** Player colliders: farmhouse + bunkhouse block fully; Field Training blocks on its
+   *  pillars / wall / fallen stones (the archway itself is walkable). Plots & pens are walkable. */
   getColliders() {
-    // Farm plots and pens are walkable; farmhouses block
+    const out = [];
+    for (const b of this.buildings) {
+      if (!b.colliders) b.colliders = this._computeColliders(b);
+      for (const c of b.colliders) out.push(c);
+    }
+    return out;
+  }
+
+  _computeColliders(b) {
+    if (b.type === 'farmhouse' || b.type === 'workerBunkhouse') {
+      const inset = b.type === 'farmhouse' ? 0.2 : 0.1;
+      return [{ minX: b.tx + inset, maxX: b.tx + b.w - inset, minZ: b.tz + inset, maxZ: b.tz + b.d - inset }];
+    }
+    if (b.type === 'dragonFieldTraining') {
+      const out = [];
+      b.mesh.updateMatrixWorld(true);
+      const box = new THREE.Box3();
+      b.mesh.traverse((o) => {
+        if (!o.isMesh || !o.userData.solid) return;
+        box.setFromObject(o);
+        out.push({ minX: box.min.x + 0.05, maxX: box.max.x - 0.05, minZ: box.min.z + 0.05, maxZ: box.max.z - 0.05 });
+      });
+      return out;
+    }
+    return [];
+  }
+
+  /** Obstacles for NPC (worker) navigation: every structure except farm plots, full footprint. */
+  getObstacles() {
     return this.buildings
-      .filter((b) => b.type === 'farmhouse')
-      .map((b) => ({
-        minX: b.tx + 0.2,
-        maxX: b.tx + b.w - 0.2,
-        minZ: b.tz + 0.2,
-        maxZ: b.tz + b.d - 0.2,
-      }));
+      .filter((b) => b.type !== 'farmPlot')
+      .map((b) => ({ id: b.id, type: b.type, minX: b.tx, maxX: b.tx + b.w, minZ: b.tz, maxZ: b.tz + b.d }));
+  }
+
+  /** World-space centre of the door face (doors are on the local south face, rotated with the building). */
+  doorPoint(b, outward = 0) {
+    const nat = BUILDINGS[b.type];
+    const theta = -(b.rotation || 0) * (Math.PI / 2);
+    const half = nat.d / 2 + outward;
+    // local offset (0, -half) rotated about Y
+    const ox = -half * Math.sin(theta);
+    const oz = -half * Math.cos(theta);
+    return { x: b.tx + b.w / 2 + ox, z: b.tz + b.d / 2 + oz, nx: Math.sign(Math.round(ox)), nz: Math.sign(Math.round(oz)) };
   }
 
   occupies(tx, tz, w, d, ignoreId = null) {
@@ -829,10 +869,9 @@ export class BuildingManager {
     let bestDist = radius;
     for (const b of this.buildings) {
       if (b.type !== 'farmhouse') continue;
-      // Door is on south face center of footprint (before rotation approx — use footprint center south)
-      const doorX = b.tx + b.w / 2;
-      const doorZ = b.tz + 0.5;
-      const dist = Math.hypot(x - doorX, z - doorZ);
+      // Door follows the building's rotation (it used to assume the -z face for every rotation).
+      const door = this.doorPoint(b);
+      const dist = Math.hypot(x - door.x, z - door.z);
       if (dist < bestDist) {
         bestDist = dist;
         best = b;
