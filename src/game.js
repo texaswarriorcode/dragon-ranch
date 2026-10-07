@@ -220,7 +220,7 @@ export class Game {
     const bunk = this.buildings.place('workerBunkhouse', -14, -2, 0);
     if (bunk) {
       this.inventory.workerBunkhouses = Math.max(0, (this.inventory.workerBunkhouses ?? 99) - 1);
-      this.workers.hire('dragonHandler', bunk, now);
+      this.workers.hire('dragonHandler', bunk, now, this.buildings.doorPoint(bunk, 1.2));
     }
     const train = this.buildings.place('dragonFieldTraining', -8, 10, 0);
     if (train) {
@@ -829,7 +829,7 @@ export class Game {
         if (!free) {
           return { ok: false, message: 'Need a free bunk in a Worker Bunkhouse' };
         }
-        const w = this.workers.hire(typeId, free, performance.now());
+        const w = this.workers.hire(typeId, free, performance.now(), this.buildings.doorPoint(free, 1.2));
         if (!w) return { ok: false, message: 'Could not hire worker' };
         return { ok: true, worker: w };
       },
@@ -1029,6 +1029,7 @@ export class Game {
     const worker = this.workers.getById(mission.workerId);
     if (worker) {
       worker.busyMission = false;
+      worker.roamTimer = 0; // pick a fresh wander target right away
       if (worker.mesh) worker.mesh.visible = true;
     }
     const lvlNote = xpResult.leveled > 0 ? ` · leveled to ${dragon.level}!` : '';
