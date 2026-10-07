@@ -1,0 +1,739 @@
+{
+  "label": "live",
+  "base": "https://texaswarriorcode.github.io/dragon-ranch/",
+  "tests": [
+    {
+      "group": "input",
+      "name": "mouse events reach the 3D canvas (elementFromPoint at screen centre)",
+      "pass": false,
+      "severity": "critical",
+      "details": {
+        "topElement": "div#fade.fade-overlay"
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key w @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.18,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.173,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key a @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 4.8,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 5.41,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 9,
+        "legAfterStop": 0.017,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key s @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.2,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.168,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key d @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.31,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 10,
+        "legAfterStop": 0.109,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowUp @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 5.98,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.107,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowLeft @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 4.8,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 5.43,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 9,
+        "legAfterStop": 0.15,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowDown @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.22,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.095,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowRight @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.51,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.174,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "diagonal w+d speed ratio vs straight",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6.44,
+        "dirErrDeg": 3.8,
+        "speedPerGameSec": 12,
+        "realSpeed": 5.97,
+        "facingErrDeg": 45,
+        "legAmp": 0.55,
+        "frames": 12,
+        "legAfterStop": 0.059,
+        "yaw": 0,
+        "ratio": 1
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "diagonal s+a speed ratio vs straight",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6.44,
+        "dirErrDeg": 3.8,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.07,
+        "facingErrDeg": 45,
+        "legAmp": 0.55,
+        "frames": 12,
+        "legAfterStop": 0.094,
+        "yaw": 0,
+        "ratio": 1
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "diagonal ArrowUp+ArrowLeft speed ratio vs straight",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6.44,
+        "dirErrDeg": 3.8,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.22,
+        "facingErrDeg": 45,
+        "legAmp": 0.55,
+        "frames": 12,
+        "legAfterStop": 0.133,
+        "yaw": 0,
+        "ratio": 1
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "Q hold rotates camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "yawDelta": 0.72,
+        "note": "expected 1.8 rad/game-s; game dt clamps at 50ms so slower at <20fps"
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key w after Q rotation follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.18,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.154,
+        "yaw": 0.72
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key d after Q rotation follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.25,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.057,
+        "yaw": 0.72
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "E hold rotates camera (opposite of Q)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "yawDelta": -0.54
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "right-drag rotates camera yaw (and pitch)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "yaw": -1.25,
+        "pitch": 0.4999999999999998,
+        "expectYaw": -1.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key w after right-drag follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.23,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.18,
+        "yaw": -1.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowLeft after right-drag follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.06,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.056,
+        "yaw": -1.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "pitch clamped to [0.25, 1.35]",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "pMax": 1.35,
+        "pMin": 1.35
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "sprint (Shift) — exists?",
+      "pass": null,
+      "severity": "medium",
+      "details": {
+        "speedWithShift": 12,
+        "normal": 12,
+        "note": "No sprint mechanic in game (Shift has no effect)"
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "low energy (<25) slows to 0.55x",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 2.97,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 6.6,
+        "realSpeed": 3.38,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.14,
+        "yaw": 0,
+        "ratio": 0.55
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "energy drains ~2.5/s while moving",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "drained": 2.75
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "walk animation plays while moving & settles when stopped",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "legAmp": 0.53,
+        "legAfterStop": 0.006
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "camera follow smooth (steady speed CV, no direction jitter, settles)",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "camSpeedMean": 11.99,
+        "camSpeedCV": 0.002,
+        "maxDirDeviationDeg": 0,
+        "settleStepMax": 0.3007,
+        "frames": 17
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "zoom clamps at [6, 40]",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "start": 16,
+        "zMax": 40,
+        "zMin": 6,
+        "notchesFromDefaultToMax": 70,
+        "unitsPerNotch": 0.4
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "zoom feels slow (wheel notches default→max)",
+      "pass": false,
+      "severity": "low",
+      "details": {
+        "notchesToMax": 70,
+        "note": "each 100px wheel notch = 0.4 units"
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound +X edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": 498.5,
+          "z": 0
+        },
+        "limit": 498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound -X edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": -498.5,
+          "z": 0
+        },
+        "limit": -498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound +Z edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": 0,
+          "z": 498.5
+        },
+        "limit": 498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound -Z edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": 0,
+          "z": -498.5
+        },
+        "limit": -498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "corner clamp + slides along edge + not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "corner": {
+          "x": 498.5,
+          "z": 498.5
+        },
+        "afterSlide": {
+          "x": 498.5,
+          "z": 491.36030303803307
+        }
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "farmhouse rot0: blocks player, no clipping, not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "footprint": "6x6",
+        "worstPenetration": 0,
+        "worstFrom": null,
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 16
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "farmhouse rot0: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 2.12,
+        "dz": 0.6,
+        "endZ": 149.6,
+        "faceZ": 150
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "farmhouse rot1: blocks player, no clipping, not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "footprint": "6x6",
+        "worstPenetration": 0,
+        "worstFrom": null,
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 16
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "farmhouse rot1: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 2.12,
+        "dz": 0.6,
+        "endZ": 149.6,
+        "faceZ": 150
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "workerBunkhouse rot0: blocks player, no clipping, not stuck",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "footprint": "4x10",
+        "worstPenetration": 0.5,
+        "worstFrom": "north(+z)",
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 18
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "workerBunkhouse rot0: slides along wall when pushing diagonally",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "dx": 2.12,
+        "dz": 3.32,
+        "endZ": 172.32,
+        "faceZ": 170
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "workerBunkhouse rot1: blocks player, no clipping, not stuck",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "footprint": "10x4",
+        "worstPenetration": 0.5,
+        "worstFrom": "west(-x)",
+        "walkedThroughFrom": [
+          "north(+z)"
+        ],
+        "stuckFrom": [],
+        "solidParts": 18
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "workerBunkhouse rot1: slides along wall when pushing diagonally",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "dx": 2.12,
+        "dz": 3.32,
+        "endZ": 174.32,
+        "faceZ": 172
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "dragonFieldTraining rot0: blocks player, no clipping, not stuck",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "footprint": "6x6",
+        "worstPenetration": 0.4,
+        "worstFrom": "west off-centre",
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 5
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "dragonFieldTraining rot0: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 2.55,
+        "dz": 3.75,
+        "endZ": 197.75,
+        "faceZ": 195
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "dragonFieldTraining rot1: blocks player, no clipping, not stuck",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "footprint": "6x6",
+        "worstPenetration": 0.56,
+        "worstFrom": "south off-centre",
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 5
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "dragonFieldTraining rot1: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 2.16,
+        "dz": 3.09,
+        "endZ": 197.09,
+        "faceZ": 195
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "farmhouse placed on top of player (UI) — player can walk out",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "placedOver": true,
+        "pos": {
+          "x": 230.5,
+          "z": 150.5
+        }
+      }
+    }
+  ],
+  "console": [
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x1f1c001a7e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x1f1c001a7e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x1f1c001a7e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    }
+  ],
+  "metrics": {
+    "cssWorkaroundInjected": true,
+    "fps": {
+      "idleSpawn": {
+        "frames": 28,
+        "fps": 7.1,
+        "avgFrameMs": 140.8,
+        "p95FrameMs": 160.1,
+        "maxFrameMs": 169.2,
+        "avgRenderMs": 3.7,
+        "drawCalls": 496,
+        "triangles": 22974,
+        "sceneObjects": 406
+      },
+      "worldCorner": {
+        "frames": 51,
+        "fps": 17.2,
+        "avgFrameMs": 58.3,
+        "p95FrameMs": 63.8,
+        "maxFrameMs": 64.7,
+        "avgRenderMs": 1,
+        "drawCalls": 21,
+        "triangles": 9066,
+        "sceneObjects": 475
+      },
+      "walking": {
+        "frames": 52,
+        "fps": 10.5,
+        "avgFrameMs": 95,
+        "p95FrameMs": 109.6,
+        "maxFrameMs": 114,
+        "avgRenderMs": 1,
+        "drawCalls": 23,
+        "triangles": 9090,
+        "sceneObjects": 475,
+        "walkedToX": -417
+      }
+    },
+    "consoleCount": 11
+  },
+  "_canvasChecked": true
+}

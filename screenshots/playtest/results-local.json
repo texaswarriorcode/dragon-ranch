@@ -1,0 +1,1681 @@
+{
+  "label": "local",
+  "base": "http://127.0.0.1:5174/",
+  "tests": [
+    {
+      "group": "input",
+      "name": "mouse events reach the 3D canvas (grid of points over the play area)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "topElementAtCentre": "canvas#game-canvas.",
+        "pointsOnCanvas": 40,
+        "pointsTested": 40,
+        "blockers": {}
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key w @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 4.8,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 5.94,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 9,
+        "legAfterStop": 0.019,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key a @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.58,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 10,
+        "legAfterStop": 0.001,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key s @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.13,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.018,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key d @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.47,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 10,
+        "legAfterStop": 0.012,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowUp @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 4.8,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 5.99,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 9,
+        "legAfterStop": 0.034,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowLeft @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.87,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 11,
+        "legAfterStop": 0.018,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowDown @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.74,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 11,
+        "legAfterStop": 0.008,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowRight @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.43,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.014,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "diagonal w+d speed ratio vs straight",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 7.04,
+        "dirErrDeg": 3.5,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.64,
+        "facingErrDeg": 45,
+        "legAmp": 0.54,
+        "frames": 13,
+        "legAfterStop": 0.019,
+        "yaw": 0,
+        "ratio": 1
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "diagonal s+a speed ratio vs straight",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6.44,
+        "dirErrDeg": 3.8,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.37,
+        "facingErrDeg": 45,
+        "legAmp": 0.55,
+        "frames": 12,
+        "legAfterStop": 0.019,
+        "yaw": 0,
+        "ratio": 1
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "diagonal ArrowUp+ArrowLeft speed ratio vs straight",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 7.04,
+        "dirErrDeg": 3.5,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.93,
+        "facingErrDeg": 45,
+        "legAmp": 0.55,
+        "frames": 13,
+        "legAfterStop": 0.019,
+        "yaw": 0,
+        "ratio": 1
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "Q hold rotates camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "yawDelta": 0.81,
+        "note": "expected 1.8 rad/game-s; game dt clamps at 50ms so slower at <20fps"
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key w after Q rotation follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.17,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.007,
+        "yaw": 0.81
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key d after Q rotation follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.25,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 10,
+        "legAfterStop": 0.015,
+        "yaw": 0.81
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "E hold rotates camera (opposite of Q)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "yawDelta": -0.72
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "right-drag rotates camera yaw (and pitch)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "yaw": -1.25,
+        "pitch": 0.4999999999999998,
+        "expectYaw": -1.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key w after right-drag follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.72,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 11,
+        "legAfterStop": 0.038,
+        "yaw": -1.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowLeft after right-drag follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.44,
+        "facingErrDeg": 0,
+        "legAmp": 0.53,
+        "frames": 10,
+        "legAfterStop": 0.007,
+        "yaw": -1.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "pitch clamped to [0.25, 1.35]",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pMax": 1.35,
+        "pMin": 0.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "sprint (Shift) — exists?",
+      "pass": null,
+      "severity": "medium",
+      "details": {
+        "speedWithShift": 12,
+        "normal": 12,
+        "note": "No sprint mechanic in game (Shift has no effect)"
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "low energy (<25) slows to 0.55x",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 2.97,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 6.6,
+        "realSpeed": 3.63,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 10,
+        "legAfterStop": 0.013,
+        "yaw": 0,
+        "ratio": 0.55
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "energy drains ~2.5/s while moving",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "drained": 2.75
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "walk animation plays while moving & settles when stopped",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "legAmp": 0.55,
+        "legAfterStop": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "camera follow smooth (steady speed CV, no direction jitter, settles)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "camSpeedMean": 12,
+        "camSpeedCV": 0,
+        "maxDirDeviationDeg": 0,
+        "settleStepMax": 0.0003,
+        "frames": 10
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "zoom clamps at [6, 40]",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "start": 16,
+        "zMax": 40,
+        "zMin": 6,
+        "notchesFromDefaultToMax": 10,
+        "unitsPerNotch": 0.4
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound +X edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": 498.5,
+          "z": 0
+        },
+        "limit": 498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound -X edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": -498.5,
+          "z": 0
+        },
+        "limit": -498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound +Z edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": 0,
+          "z": 498.5
+        },
+        "limit": 498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound -Z edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": 0,
+          "z": -498.5
+        },
+        "limit": -498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "corner clamp + slides along edge + not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "corner": {
+          "x": 498.5,
+          "z": 498.5
+        },
+        "afterSlide": {
+          "x": 498.5,
+          "z": 491.784567106745
+        }
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "farmhouse rot0: blocks player, no clipping, not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "footprint": "6x6",
+        "worstPenetration": 0,
+        "worstFrom": null,
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 16
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "farmhouse rot0: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 2.12,
+        "dz": 0.6,
+        "endZ": 149.6,
+        "faceZ": 150
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "farmhouse rot1: blocks player, no clipping, not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "footprint": "6x6",
+        "worstPenetration": 0,
+        "worstFrom": null,
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 16
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "farmhouse rot1: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 2.12,
+        "dz": 0.6,
+        "endZ": 149.6,
+        "faceZ": 150
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "workerBunkhouse rot0: blocks player, no clipping, not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "footprint": "4x10",
+        "worstPenetration": 0,
+        "worstFrom": null,
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 18
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "workerBunkhouse rot0: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 2.55,
+        "dz": 0.6,
+        "endZ": 169.6,
+        "faceZ": 170
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "workerBunkhouse rot1: blocks player, no clipping, not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "footprint": "10x4",
+        "worstPenetration": 0,
+        "worstFrom": null,
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 18
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "workerBunkhouse rot1: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 2.12,
+        "dz": 0.6,
+        "endZ": 171.6,
+        "faceZ": 172
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "dragonFieldTraining rot0: blocks player, no clipping, not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "footprint": "6x6",
+        "worstPenetration": 0,
+        "worstFrom": null,
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 5
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "dragonFieldTraining rot0: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 2.55,
+        "dz": 2.05,
+        "endZ": 196.05,
+        "faceZ": 195
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "dragonFieldTraining rot1: blocks player, no clipping, not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "footprint": "6x6",
+        "worstPenetration": 0,
+        "worstFrom": null,
+        "walkedThroughFrom": [],
+        "stuckFrom": [],
+        "solidParts": 5
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "dragonFieldTraining rot1: slides along wall when pushing diagonally",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "dx": 1.4,
+        "dz": 1.73,
+        "endZ": 195.73,
+        "faceZ": 195
+      }
+    },
+    {
+      "group": "player-collision",
+      "name": "cannot place a building on top of the player",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "placedOver": false
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place workerBunkhouse rot0 via hotbar+mouse (0,-10)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Worker Bunkhouse",
+        "id": 1,
+        "type": "workerBunkhouse",
+        "tx": -2,
+        "tz": -15,
+        "w": 4,
+        "d": 10,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonPen rot0 via hotbar+mouse (12,-10)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Pen",
+        "id": 2,
+        "type": "dragonPen",
+        "tx": 8,
+        "tz": -14,
+        "w": 8,
+        "d": 8,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place breedingPen rot1 via hotbar+mouse (-12,-10)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Breeding Pen",
+        "id": 3,
+        "type": "breedingPen",
+        "tx": -16,
+        "tz": -14,
+        "w": 8,
+        "d": 8,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmhouse rot0 via hotbar+mouse (0,6)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 4,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": 3,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place workerBunkhouse rot1 via hotbar+mouse (0,20)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Worker Bunkhouse",
+        "id": 5,
+        "type": "workerBunkhouse",
+        "tx": -5,
+        "tz": 18,
+        "w": 10,
+        "d": 4,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonFieldTraining rot0 via hotbar+mouse (14,8)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Field Training",
+        "id": 6,
+        "type": "dragonFieldTraining",
+        "tx": 11,
+        "tz": 5,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "R rotation swaps bunkhouse footprint to 10x4",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "w": 10,
+        "d": 4
+      }
+    },
+    {
+      "group": "workers",
+      "name": "hire 4 Dragon Handlers with 200 starting coins (5th fails: no coins)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "workers": 4,
+        "coinsAfter": 0,
+        "lastToast": "Need 50 coins (have 0)"
+      }
+    },
+    {
+      "group": "workers",
+      "name": "hire up to capacity 8 across 2 bunkhouses; 9th refused",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "bunkAssignments": [
+          1,
+          1,
+          1,
+          1,
+          5,
+          5,
+          5,
+          5
+        ],
+        "lastToast": "Need a free bunk in a Worker Bunkhouse"
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers spawn outside building walls (not inside bunkhouse geometry)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "spawn": [
+          {
+            "id": 1,
+            "x": -2.67,
+            "z": -15.71,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 2,
+            "x": 0.08,
+            "z": -18.27,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 3,
+            "x": -2.92,
+            "z": -15.9,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 4,
+            "x": -6.67,
+            "z": -8.39,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 5,
+            "x": 5.23,
+            "z": 14.97,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 6,
+            "x": 4.48,
+            "z": 16.31,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 7,
+            "x": 5.86,
+            "z": 22.79,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 8,
+            "x": 5.99,
+            "z": 21.54,
+            "insideOwnBunk": false
+          }
+        ]
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers never walk inside buildings/pens (through walls/fences) over 45s",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "offenders": [],
+        "frames": 500
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers stay inside world bounds",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "outOfWorld": 0
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers do not stack (pair distance < 0.5)",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "stackFrames": 128,
+        "minPairDist": 0.25
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers face walk direction, no spin jitter",
+      "pass": false,
+      "severity": "low",
+      "details": {
+        "spins": 14,
+        "facingErrFrames": 137,
+        "movingFrames": 2427
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers play a walk animation while moving (no sliding)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "framesMovingWithoutLegSwing": 0,
+        "movingFrames": 2427
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers keep moving (none frozen) and stay near home",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "paths": [
+          19.1,
+          22.7,
+          14,
+          25.8,
+          26.9,
+          39.9,
+          32.6,
+          13.1
+        ],
+        "maxBunkDist": [
+          8.4,
+          10,
+          6.6,
+          6.9,
+          10.8,
+          22.2,
+          13.8,
+          7.7
+        ]
+      }
+    },
+    {
+      "group": "missions",
+      "name": "F next to a handler opens Missions with handler preselected",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F to assign missions",
+        "open": true,
+        "sel": {
+          "workerId": "1",
+          "dragonId": "",
+          "buildingId": "",
+          "missionKey": ""
+        }
+      }
+    },
+    {
+      "group": "missions",
+      "name": "mission dropdown keeps focus after click (panel not rebuilt every frame)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "activeElementAfter400ms": "ms-dragon"
+      }
+    },
+    {
+      "group": "missions",
+      "name": "arrow keys in a focused dropdown do not move the player",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "playerMoved": 0,
+        "selectValueBefore": "",
+        "after": ""
+      }
+    },
+    {
+      "group": "missions",
+      "name": "Start mission registers with a human-speed click (120ms press)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "selState": {
+          "workerId": "1",
+          "dragonId": "5",
+          "buildingId": "6",
+          "missionKey": "takeDragonForARun"
+        },
+        "startDisabled": false,
+        "activeMissions": 1
+      }
+    },
+    {
+      "group": "missions",
+      "name": "handler hidden & parked while on mission",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "before": {
+          "workerId": 1,
+          "vis": false,
+          "busy": true,
+          "x": 13.151621413600564,
+          "z": -15.463219791001686,
+          "dragon": {
+            "id": 5,
+            "sex": "male",
+            "stage": 2,
+            "rarity": "Uncommon",
+            "level": 1,
+            "xp": 0,
+            "missionRestUntil": 0
+          },
+          "coins": 99999
+        },
+        "after": {
+          "vis": false,
+          "x": 13.151621413600564,
+          "z": -15.463219791001686
+        }
+      }
+    },
+    {
+      "group": "missions",
+      "name": "mission completes: handler returns visible, +20 coins, dragon back with XP and 10-min rest",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "before": {
+          "coins": 99999,
+          "xp": 0,
+          "level": 1
+        },
+        "done": {
+          "active": 0,
+          "vis": true,
+          "busy": false,
+          "coins": 100019,
+          "dragon": {
+            "xp": 0,
+            "level": 2,
+            "restLeftMs": 598435
+          },
+          "toast": "Mission complete! +100 XP · +20 coins · leveled to 2!"
+        }
+      }
+    },
+    {
+      "group": "missions",
+      "name": "returned handler resumes wandering",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "p0": {
+          "x": 14.423054052217394,
+          "z": -15.611067839550936
+        },
+        "p1": {
+          "x": 10.44454457976561,
+          "z": -15.196735011541366
+        }
+      }
+    },
+    {
+      "group": "persistence",
+      "name": "save/reload keeps workers, busy handler, in-progress mission, buildings, coins, pen dragons",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "pre": {
+          "workers": 8,
+          "busy": [
+            1
+          ],
+          "missions": [
+            {
+              "key": "takeDragonForARun",
+              "workerId": 1,
+              "endsAt": 1791409772037
+            }
+          ],
+          "buildings": 6,
+          "coins": 100019,
+          "penDragons": [
+            12,
+            11,
+            10
+          ],
+          "inv": [
+            1,
+            2,
+            3,
+            4,
+            7,
+            8,
+            9,
+            5
+          ]
+        },
+        "post": {
+          "workers": 8,
+          "busy": [],
+          "hiddenBusy": true,
+          "missions": [],
+          "buildings": 6,
+          "coins": 100019,
+          "penDragons": [],
+          "inv": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "group": "persistence",
+      "name": "dragon IDs stay unique after reload (no collision with pen/mission dragons)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "newId": 13,
+        "collides": false,
+        "taken": [
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          5
+        ]
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "dragons stay inside pen fences over 40s (incl. rotated + world-corner pens)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "escapes": 0,
+        "worstOutside": 0,
+        "offenders": [],
+        "dragons": 16,
+        "frames": 280,
+        "pens": [
+          "dragonPen r0",
+          "breedingPen r0",
+          "dragonPen r1",
+          "breedingPen r3",
+          "dragonPen r2"
+        ]
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "dragons face their walking direction (no spin-in-place)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "faceErr": 0,
+        "moving": 2813,
+        "spinInPlace": 0
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "dragon grows (stage up + mesh scales up)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "id": 11,
+        "stageBefore": 0,
+        "stageAfter": 2,
+        "heightBefore": 0.46,
+        "heightAfter": 1.18
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "demo/world dragon IDs do not collide with inventory dragon IDs",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "clashingIds": []
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "pick up adult dragon (aim + F)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F to pick up adult dragon",
+        "inWorld": false,
+        "invCount": 9,
+        "invBefore": 8,
+        "dupIds": 1
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "place dragon back into pen (hotbar 8 + click)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F / click to place Rare adult male",
+        "back": {
+          "penId": 7
+        },
+        "selectedDragon": 8
+      }
+    },
+    {
+      "group": "core-breeding",
+      "name": "adult pair lays an egg after breed timer",
+      "pass": true,
+      "severity": null,
+      "details": {}
+    },
+    {
+      "group": "core-breeding",
+      "name": "egg hatches into a baby in inventory (real 15s timer)",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "inv0": 8,
+        "inv1": 10
+      }
+    },
+    {
+      "group": "core-feeding",
+      "name": "feed baby dragonfruit (hotbar 9 + click) speeds growth",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F / click to feed",
+        "stageStartBefore": 436,
+        "after": -17652
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmhouse with 0x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 1,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": -3,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmPlot with 0x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farm Plot",
+        "id": 2,
+        "type": "farmPlot",
+        "tx": 8,
+        "tz": -2,
+        "w": 4,
+        "d": 4,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonPen with 1x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Pen",
+        "id": 3,
+        "type": "dragonPen",
+        "tx": 16,
+        "tz": -4,
+        "w": 8,
+        "d": 8,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place breedingPen with 2x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Breeding Pen",
+        "id": 4,
+        "type": "breedingPen",
+        "tx": 28,
+        "tz": -4,
+        "w": 8,
+        "d": 8,
+        "rotation": 2
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place workerBunkhouse with 1x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Worker Bunkhouse",
+        "id": 5,
+        "type": "workerBunkhouse",
+        "tx": -17,
+        "tz": -2,
+        "w": 10,
+        "d": 4,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonFieldTraining with 3x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Field Training",
+        "id": 6,
+        "type": "dragonFieldTraining",
+        "tx": -29,
+        "tz": -3,
+        "w": 6,
+        "d": 6,
+        "rotation": 3
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmhouse with 2x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 7,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": 13,
+        "w": 6,
+        "d": 6,
+        "rotation": 2
+      }
+    },
+    {
+      "group": "core-farming",
+      "name": "plant 4 seeds via hotbar 7 + click",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "seeds0": 20,
+        "crops": 4,
+        "seeds": 16
+      }
+    },
+    {
+      "group": "core-farming",
+      "name": "crops grow to stage 4 and harvest by click",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "stages": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "fruit0": 5,
+        "crops": 0,
+        "fruit": 9
+      }
+    },
+    {
+      "group": "core-rest",
+      "name": "F at farmhouse door rests (fade, time skip, energy refilled)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "restPrompt": "Press F to rest",
+        "gt0": 167020,
+        "resting": false,
+        "energy": 100,
+        "gameTime": 248019.8999999985
+      }
+    },
+    {
+      "group": "core-rest",
+      "name": "rotated farmhouse: rest prompt at the actual door, not the back wall",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "atDoor": "Press F to rest",
+        "atBack": ""
+      }
+    },
+    {
+      "group": "core-market",
+      "name": "buy Worker Bunkhouse (75 coins) → inventory +1",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "inv0": {
+          "coins": 200,
+          "bunks": 98
+        },
+        "inv1": {
+          "coins": 125,
+          "bunks": 99
+        }
+      }
+    },
+    {
+      "group": "ui",
+      "name": "hotbar keys ignored while Marketplace is open",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "group": "ui",
+      "name": "movement while Marketplace open (info: player can walk with panel open)",
+      "pass": null,
+      "severity": "medium",
+      "details": {
+        "moved": 2.4
+      }
+    },
+    {
+      "group": "ui",
+      "name": "panels do not overlap HUD (help/hotbar/inventory/day)",
+      "pass": false,
+      "severity": "low",
+      "details": {
+        "overlaps": {
+          "#market-panel": [
+            "help"
+          ],
+          "#dragon-panel": [],
+          "#mission-panel": []
+        },
+        "hud": {
+          "help": {
+            "x": 988,
+            "y": 12,
+            "w": 280,
+            "h": 261.828125
+          },
+          "hotbar": {
+            "x": 373,
+            "y": 612,
+            "w": 534,
+            "h": 90
+          },
+          "inv": {
+            "x": 18,
+            "y": 583,
+            "w": 162.171875,
+            "h": 119
+          },
+          "day": {
+            "x": 12,
+            "y": 12,
+            "w": 170,
+            "h": 76
+          }
+        }
+      }
+    },
+    {
+      "group": "ui",
+      "name": "Esc closes top panel first, then clears selection",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "afterFirstEsc": {
+          "missions": false,
+          "sel": "dragonPen"
+        },
+        "afterSecondEsc": {
+          "missions": false,
+          "sel": null
+        }
+      }
+    },
+    {
+      "group": "ui",
+      "name": "tapping E (camera rotate key) near the door does not trigger rest/interact",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "restingAfterE": false
+      }
+    },
+    {
+      "group": "ui",
+      "name": "tapping E with a build item selected does not place it",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "before": 6,
+        "after": 6
+      }
+    },
+    {
+      "group": "ui",
+      "name": "click on ripe crop near a handler harvests (does not hijack into Missions)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "cropsBefore": 16,
+        "missionsOpen": false,
+        "crops": 15
+      }
+    },
+    {
+      "group": "ui",
+      "name": "held keys released on window blur (no stuck movement after alt-tab)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "movedAfterBlur": 0
+      }
+    }
+  ],
+  "console": [
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x340c001a9600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x340c001a9600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x340c001a9600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x340c001a9600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    }
+  ],
+  "metrics": {
+    "fps": {
+      "idleSpawn": {
+        "frames": 30,
+        "fps": 7.7,
+        "avgFrameMs": 130.1,
+        "p95FrameMs": 150.4,
+        "maxFrameMs": 154.7,
+        "avgRenderMs": 4.1,
+        "drawCalls": 499,
+        "triangles": 22970,
+        "sceneObjects": 416
+      },
+      "worldCorner": {
+        "frames": 58,
+        "fps": 19.4,
+        "avgFrameMs": 51.5,
+        "p95FrameMs": 57,
+        "maxFrameMs": 60.4,
+        "avgRenderMs": 0.9,
+        "drawCalls": 23,
+        "triangles": 9090,
+        "sceneObjects": 488
+      },
+      "walking": {
+        "frames": 51,
+        "fps": 10.4,
+        "avgFrameMs": 96.4,
+        "p95FrameMs": 103.3,
+        "maxFrameMs": 106.3,
+        "avgRenderMs": 1,
+        "drawCalls": 25,
+        "triangles": 9114,
+        "sceneObjects": 485,
+        "walkedToX": -417.6
+      }
+    },
+    "workerWander": [
+      {
+        "id": 1,
+        "inside": {},
+        "path": 19.1,
+        "spin": 1,
+        "faceErr": 79,
+        "movingFrames": 239,
+        "noAnimFrames": 0,
+        "maxBunkDist": 8.4,
+        "idleFrames": 260
+      },
+      {
+        "id": 2,
+        "inside": {},
+        "path": 22.7,
+        "spin": 2,
+        "faceErr": 8,
+        "movingFrames": 284,
+        "noAnimFrames": 0,
+        "maxBunkDist": 10,
+        "idleFrames": 215
+      },
+      {
+        "id": 3,
+        "inside": {},
+        "path": 14,
+        "spin": 0,
+        "faceErr": 6,
+        "movingFrames": 175,
+        "noAnimFrames": 0,
+        "maxBunkDist": 6.6,
+        "idleFrames": 324
+      },
+      {
+        "id": 4,
+        "inside": {},
+        "path": 25.8,
+        "spin": 2,
+        "faceErr": 8,
+        "movingFrames": 322,
+        "noAnimFrames": 0,
+        "maxBunkDist": 6.9,
+        "idleFrames": 177
+      },
+      {
+        "id": 5,
+        "inside": {},
+        "path": 26.9,
+        "spin": 1,
+        "faceErr": 5,
+        "movingFrames": 336,
+        "noAnimFrames": 0,
+        "maxBunkDist": 10.8,
+        "idleFrames": 163
+      },
+      {
+        "id": 6,
+        "inside": {},
+        "path": 39.9,
+        "spin": 1,
+        "faceErr": 7,
+        "movingFrames": 499,
+        "noAnimFrames": 0,
+        "maxBunkDist": 22.2,
+        "idleFrames": 0
+      },
+      {
+        "id": 7,
+        "inside": {},
+        "path": 32.6,
+        "spin": 5,
+        "faceErr": 14,
+        "movingFrames": 408,
+        "noAnimFrames": 0,
+        "maxBunkDist": 13.8,
+        "idleFrames": 91
+      },
+      {
+        "id": 8,
+        "inside": {},
+        "path": 13.1,
+        "spin": 2,
+        "faceErr": 10,
+        "movingFrames": 164,
+        "noAnimFrames": 0,
+        "maxBunkDist": 7.7,
+        "idleFrames": 335
+      }
+    ],
+    "consoleCount": 4
+  },
+  "_canvasChecked": true
+}

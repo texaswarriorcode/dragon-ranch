@@ -1,0 +1,110 @@
+
+=== [final] phase movement ===
+[final] PASS input :: mouse events reach the 3D canvas (grid of points over the play area) {"topElementAtCentre":"canvas#game-canvas.","pointsOnCanvas":40,"pointsTested":40,"blockers":{}}
+[final] PASS player-movement :: key w @yaw0: direction/speed/facing {"ok":true,"dist":6,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.73,"facingErrDeg":0,"legAmp":0.55,"frames":11,"legAfterStop":0.014,"yaw":0}
+[final] PASS player-movement :: key a @yaw0: direction/speed/facing {"ok":true,"dist":5.4,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.04,"facingErrDeg":0,"legAmp":0.54,"frames":10,"legAfterStop":0.017,"yaw":0}
+[final] PASS player-movement :: key s @yaw0: direction/speed/facing {"ok":true,"dist":5.4,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.01,"facingErrDeg":0,"legAmp":0.55,"frames":10,"legAfterStop":0.008,"yaw":0}
+[final] PASS player-movement :: key d @yaw0: direction/speed/facing {"ok":true,"dist":5.4,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.13,"facingErrDeg":0,"legAmp":0.55,"frames":10,"legAfterStop":0.019,"yaw":0}
+[final] PASS player-movement :: key ArrowUp @yaw0: direction/speed/facing {"ok":true,"dist":5.4,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.06,"facingErrDeg":0,"legAmp":0.55,"frames":10,"legAfterStop":0.007,"yaw":0}
+[final] PASS player-movement :: key ArrowLeft @yaw0: direction/speed/facing {"ok":true,"dist":4.8,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":5.9,"facingErrDeg":0,"legAmp":0.54,"frames":9,"legAfterStop":0.019,"yaw":0}
+[final] PASS player-movement :: key ArrowDown @yaw0: direction/speed/facing {"ok":true,"dist":6,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.92,"facingErrDeg":0,"legAmp":0.55,"frames":11,"legAfterStop":0.016,"yaw":0}
+[final] PASS player-movement :: key ArrowRight @yaw0: direction/speed/facing {"ok":true,"dist":6,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.79,"facingErrDeg":0,"legAmp":0.55,"frames":11,"legAfterStop":0.003,"yaw":0}
+[final] PASS player-movement :: diagonal w+d speed ratio vs straight {"ok":true,"dist":6.44,"dirErrDeg":3.8,"speedPerGameSec":12,"realSpeed":6.37,"facingErrDeg":45,"legAmp":0.54,"frames":12,"legAfterStop":0.015,"yaw":0,"ratio":1}
+[final] PASS player-movement :: diagonal s+a speed ratio vs straight {"ok":true,"dist":6.44,"dirErrDeg":3.8,"speedPerGameSec":12,"realSpeed":6.14,"facingErrDeg":45,"legAmp":0.55,"frames":12,"legAfterStop":0.018,"yaw":0,"ratio":1}
+[final] PASS player-movement :: diagonal ArrowUp+ArrowLeft speed ratio vs straight {"ok":true,"dist":6.44,"dirErrDeg":3.8,"speedPerGameSec":12,"realSpeed":6.21,"facingErrDeg":45,"legAmp":0.55,"frames":12,"legAfterStop":0.019,"yaw":0,"ratio":1}
+[final] PASS player-movement :: Q hold rotates camera {"yawDelta":0.72,"note":"expected 1.8 rad/game-s; game dt clamps at 50ms so slower at <20fps"}
+[final] PASS player-movement :: key w after Q rotation follows camera {"ok":true,"dist":5.4,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.36,"facingErrDeg":0,"legAmp":0.55,"frames":10,"legAfterStop":0.007,"yaw":0.72}
+[final] PASS player-movement :: key d after Q rotation follows camera {"ok":true,"dist":6,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.75,"facingErrDeg":0,"legAmp":0.54,"frames":11,"legAfterStop":0.008,"yaw":0.72}
+[final] PASS player-movement :: E hold rotates camera (opposite of Q) {"yawDelta":-0.72}
+[final] PASS player-movement :: right-drag rotates camera yaw (and pitch) {"yaw":-1.25,"pitch":0.4999999999999998,"expectYaw":-1.25}
+[final] PASS player-movement :: key w after right-drag follows camera {"ok":true,"dist":5.4,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.54,"facingErrDeg":0,"legAmp":0.55,"frames":10,"legAfterStop":0.019,"yaw":-1.25}
+[final] PASS player-movement :: key ArrowLeft after right-drag follows camera {"ok":true,"dist":6,"dirErrDeg":0,"speedPerGameSec":12,"realSpeed":6.64,"facingErrDeg":0,"legAmp":0.53,"frames":11,"legAfterStop":0.012,"yaw":-1.25}
+[final] PASS player-movement :: pitch clamped to [0.25, 1.35] {"pMax":1.35,"pMin":0.25}
+[final] INFO player-movement :: sprint (Shift) — exists? {"speedWithShift":12,"normal":12,"note":"No sprint mechanic in game (Shift has no effect)"}
+[final] PASS player-movement :: low energy (<25) slows to 0.55x {"ok":true,"dist":3.3,"dirErrDeg":0,"speedPerGameSec":6.6,"realSpeed":3.65,"facingErrDeg":0,"legAmp":0.54,"frames":11,"legAfterStop":0.019,"yaw":0,"ratio":0.55}
+[final] PASS player-movement :: energy drains ~2.5/s while moving {"drained":2.75}
+[final] PASS player-movement :: walk animation plays while moving & settles when stopped {"legAmp":0.55,"legAfterStop":0}
+[final] PASS player-movement :: camera follow smooth (steady speed CV, no direction jitter, settles) {"camSpeedMean":12,"camSpeedCV":0,"maxDirDeviationDeg":0,"settleStepMax":0.0004,"frames":12}
+[final] PASS player-movement :: zoom clamps at [6, 40] {"start":16,"zMax":40,"zMin":6,"notchesFromDefaultToMax":10,"unitsPerNotch":0.4}
+[final] PASS player-movement :: world bound +X edge clamps at ±498.5 {"pos":{"x":498.5,"z":0},"limit":498.5}
+[final] PASS player-movement :: world bound -X edge clamps at ±498.5 {"pos":{"x":-498.5,"z":0},"limit":-498.5}
+[final] PASS player-movement :: world bound +Z edge clamps at ±498.5 {"pos":{"x":0,"z":498.5},"limit":498.5}
+[final] PASS player-movement :: world bound -Z edge clamps at ±498.5 {"pos":{"x":0,"z":-498.5},"limit":-498.5}
+[final] PASS player-movement :: corner clamp + slides along edge + not stuck {"corner":{"x":498.5,"z":498.5},"afterSlide":{"x":498.5,"z":490.94282719439525}}
+=== phase movement done in 138.0s ===
+
+=== [final] phase collision ===
+[final] PASS player-collision :: farmhouse rot0: blocks player, no clipping, not stuck {"footprint":"6x6","worstPenetration":0,"worstFrom":null,"walkedThroughFrom":[],"stuckFrom":[],"solidParts":16}
+[final] PASS player-collision :: farmhouse rot0: slides along wall when pushing diagonally {"dx":2.55,"dz":0.6,"endZ":149.6,"faceZ":150}
+[final] PASS player-collision :: farmhouse rot1: blocks player, no clipping, not stuck {"footprint":"6x6","worstPenetration":0,"worstFrom":null,"walkedThroughFrom":[],"stuckFrom":[],"solidParts":16}
+[final] PASS player-collision :: farmhouse rot1: slides along wall when pushing diagonally {"dx":2.12,"dz":0.6,"endZ":149.6,"faceZ":150}
+[final] PASS player-collision :: workerBunkhouse rot0: blocks player, no clipping, not stuck {"footprint":"4x10","worstPenetration":0,"worstFrom":null,"walkedThroughFrom":[],"stuckFrom":[],"solidParts":18}
+[final] PASS player-collision :: workerBunkhouse rot0: slides along wall when pushing diagonally {"dx":2.55,"dz":0.6,"endZ":169.6,"faceZ":170}
+[final] PASS player-collision :: workerBunkhouse rot1: blocks player, no clipping, not stuck {"footprint":"10x4","worstPenetration":0,"worstFrom":null,"walkedThroughFrom":[],"stuckFrom":[],"solidParts":18}
+[final] PASS player-collision :: workerBunkhouse rot1: slides along wall when pushing diagonally {"dx":2.12,"dz":0.6,"endZ":171.6,"faceZ":172}
+[final] PASS player-collision :: dragonFieldTraining rot0: blocks player, no clipping, not stuck {"footprint":"6x6","worstPenetration":0,"worstFrom":null,"walkedThroughFrom":[],"stuckFrom":[],"solidParts":5}
+[final] PASS player-collision :: dragonFieldTraining rot0: slides along wall when pushing diagonally {"dx":2.97,"dz":2.47,"endZ":196.47,"faceZ":195}
+[final] PASS player-collision :: dragonFieldTraining rot1: blocks player, no clipping, not stuck {"footprint":"6x6","worstPenetration":0,"worstFrom":null,"walkedThroughFrom":[],"stuckFrom":[],"solidParts":5}
+[final] PASS player-collision :: dragonFieldTraining rot1: slides along wall when pushing diagonally {"dx":1.4,"dz":1.73,"endZ":195.73,"faceZ":195}
+[final] PASS player-collision :: player starting inside a building can walk out (never trapped) {"startX":-12,"endX":-8.37}
+[final] PASS player-collision :: cannot place a building on top of the player {"placedOver":false}
+=== phase collision done in 137.0s ===
+
+=== [final] phase workers ===
+[final] PASS core-buildings :: place workerBunkhouse rot0 via hotbar+mouse (0,-10) {"ok":true,"prompt":"Click / F to place Worker Bunkhouse","id":13,"type":"workerBunkhouse","tx":-2,"tz":-15,"w":4,"d":10,"rotation":0}
+[final] PASS core-buildings :: place dragonPen rot0 via hotbar+mouse (12,-10) {"ok":true,"prompt":"Click / F to place Dragon Pen","id":14,"type":"dragonPen","tx":8,"tz":-14,"w":8,"d":8,"rotation":0}
+[final] PASS core-buildings :: place breedingPen rot1 via hotbar+mouse (-12,-10) {"ok":true,"prompt":"Click / F to place Breeding Pen","id":15,"type":"breedingPen","tx":-16,"tz":-14,"w":8,"d":8,"rotation":1}
+[final] FAIL core-buildings :: place farmhouse rot0 via hotbar+mouse (0,6) {"ok":false,"prompt":"Cannot place here","id":15,"type":"breedingPen","tx":-16,"tz":-14,"w":8,"d":8,"rotation":1}
+[final] PASS core-buildings :: place workerBunkhouse rot1 via hotbar+mouse (0,20) {"ok":true,"prompt":"Click / F to place Worker Bunkhouse","id":16,"type":"workerBunkhouse","tx":-5,"tz":18,"w":10,"d":4,"rotation":1}
+[final] FAIL core-buildings :: place dragonFieldTraining rot0 via hotbar+mouse (14,8) {"ok":false,"prompt":"Cannot place here","id":16,"type":"workerBunkhouse","tx":-5,"tz":18,"w":10,"d":4,"rotation":1}
+[final] PASS core-buildings :: R rotation swaps bunkhouse footprint to 10x4 {"w":10,"d":4}
+[final] FAIL workers :: hire 4 Dragon Handlers with 200 starting coins (5th fails: no coins) {"workers":5,"coinsAfter":0,"lastToast":"Need 50 coins (have 0)"}
+[final] FAIL workers :: hire up to capacity 8 across 2 bunkhouses; 9th refused {"bunkAssignments":[5,5,5,5,9,9,9,9,10,10],"lastToast":"Hired Dragon Handler!"}
+[final] PASS workers :: workers spawn outside building walls (not inside bunkhouse geometry) {"spawn":[{"id":1,"x":-2.55,"z":-4.58,"insideOwnBunk":false},{"id":2,"x":-8.42,"z":6.47,"insideOwnBunk":false},{"id":3,"x":-5.3,"z":-1.22,"insideOwnBunk":false},{"id":4,"x":-7.06,"z":-5.12,"insideOwnBunk":false},{"id":5,"x":146.92,"z":162.86,"insideOwnBunk":false},{"id":6,"x":148.13,"z":164.52,"insideOwnBunk":false},{"id":7,"x":150.94,"z":169.01,"insideOwnBunk":false},{"id":8,"x":150.11,"z":166.64
+[final] PASS workers :: workers never walk inside buildings/pens (through walls/fences) over 45s {"offenders":[],"frames":377}
+[final] PASS workers :: workers stay inside world bounds {"outOfWorld":0}
+[final] PASS workers :: workers do not stack (pair distance < 0.5) {"stackFrames":0,"minPairDist":0.6}
+[final] PASS workers :: workers face walk direction, no spin jitter {"spins":0,"facingErrFrames":11,"movingFrames":2212}
+[final] PASS workers :: workers play a walk animation while moving (no sliding) {"framesMovingWithoutLegSwing":0,"movingFrames":2212}
+[final] PASS workers :: workers keep moving (none frozen) and stay near home {"paths":[17.8,18.6,26.5,21.8,6.6,19.9,9.5,25.2,19.2,11.5],"maxBunkDist":[11.4,9.2,10.5,9.8,13,17.2,6.4,13.2,7.6,6.4]}
+[final] PASS missions :: F next to a handler opens Missions with handler preselected {"prompt":"Press F to assign missions","open":true,"sel":{"workerId":"1","dragonId":"","buildingId":"","missionKey":""}}
+[final] PASS missions :: mission dropdown keeps focus after click (panel not rebuilt every frame) {"activeElementAfter400ms":"ms-dragon"}
+[final] PASS missions :: arrow keys in a focused dropdown do not move the player {"playerMoved":0,"selectValueBefore":"","after":""}
+[final] PASS missions :: Start mission registers with a human-speed click (120ms press) {"selState":{"workerId":"1","dragonId":"15","buildingId":"6","missionKey":"takeDragonForARun"},"startDisabled":false,"activeMissions":1}
+[final] PASS missions :: handler hidden & parked while on mission {"before":{"workerId":1,"vis":false,"busy":true,"x":-8.398474096032995,"z":4.336710273465366,"dragon":{"id":15,"sex":"male","stage":2,"rarity":"Legendary","level":50,"xp":0,"missionRestUntil":0},"coins":99999},"after":{"vis":false,"x":-8.398474096032995,"z":4.336710273465366}}
+[final] PASS missions :: mission completes: handler returns visible, +20 coins, dragon back with XP and 10-min rest {"before":{"coins":99999,"xp":0,"level":50},"done":{"active":0,"vis":true,"busy":false,"coins":100019,"dragon":{"xp":100,"level":50,"restLeftMs":598528},"toast":"Mission complete! +100 XP · +20 coins"}}
+[final] PASS missions :: returned handler resumes wandering {"p0":{"x":-8.465036979558999,"z":3.7001811048197286},"p1":{"x":-8.847773559833504,"z":0.04013838510731815}}
+[final] PASS persistence :: save/reload keeps workers, busy handler, in-progress mission, buildings, coins, pen dragons {"pre":{"workers":10,"busy":[1],"missions":[{"key":"takeDragonForARun","workerId":1,"endsAt":1791411228915}],"buildings":16,"coins":100019,"penDragons":[9,10,11,12,13,14],"inv":[5,6,7,8,17,18,19,15]},"post":{"workers":10,"busy":[1],"hiddenBusy":true,"missions":[{"key":"takeDragonForARun","workerId":1,"endsAt":1791411228915}],"buildings":16,"coins":100019,"penDragons":[9,10,11,12,13,14],"inv":[5,6,
+[final] PASS persistence :: dragon IDs stay unique after reload (no collision with pen/mission dragons) {"newId":20,"collides":false,"taken":[9,10,11,12,13,14,16,5,6,7,8,17,18,19,15]}
+=== phase workers done in 169.0s ===
+
+=== [final] phase dragons ===
+[final] PASS dragons :: dragons stay inside pen fences over 40s (incl. rotated + world-corner pens) {"escapes":0,"worstOutside":0,"offenders":[],"dragons":16,"frames":285,"pens":["dragonPen r0","breedingPen r0","dragonPen r1","breedingPen r3","dragonPen r2"]}
+[final] PASS dragons :: dragons face their walking direction (no spin-in-place) {"faceErr":0,"moving":2818,"spinInPlace":0}
+[final] PASS dragons :: dragon grows (stage up + mesh scales up) {"id":11,"stageBefore":0,"stageAfter":2,"heightBefore":0.46,"heightAfter":1.18}
+[final] PASS dragons :: demo/world dragon IDs do not collide with inventory dragon IDs {"clashingIds":[]}
+[final] PASS dragons :: pick up adult dragon (aim + F) {"prompt":"Press F to pick up adult dragon","inWorld":false,"invCount":9,"invBefore":8,"dupIds":1}
+[final] PASS dragons :: place dragon back into pen (hotbar 8 + click) {"prompt":"Press F / click to place Rare adult male","back":{"penId":7},"selectedDragon":8}
+[final] PASS core-breeding :: adult pair lays an egg after breed timer {}
+[final] PASS core-breeding :: egg hatches into a baby in inventory (real 15s timer) {"inv0":8,"inv1":10,"note":"second (rotated) breeding pen may hatch too"}
+[final] PASS core-feeding :: feed baby dragonfruit (hotbar 9 + click) speeds growth {"prompt":"Press F / click to feed","stageStartBefore":222,"after":-17937}
+=== phase dragons done in 86.5s ===
+
+=== [final] phase core ===
+[final] FAIL core-buildings :: place farmhouse with 0x R via UI {"ok":false,"prompt":"Cannot place here","id":9,"type":"dragonPen","tx":490,"tz":490,"w":8,"d":8,"rotation":2}
+[final] FAIL core-buildings :: place farmPlot with 0x R via UI {"ok":false,"prompt":"Cannot place here","id":9,"type":"dragonPen","tx":490,"tz":490,"w":8,"d":8,"rotation":2}
+[final] FAIL core-buildings :: place dragonPen with 1x R via UI {"ok":false,"prompt":"Cannot place here","id":9,"type":"dragonPen","tx":490,"tz":490,"w":8,"d":8,"rotation":2}
+[final] FAIL core-buildings :: place breedingPen with 2x R via UI {"ok":false,"prompt":"Cannot place here","id":9,"type":"dragonPen","tx":490,"tz":490,"w":8,"d":8,"rotation":2}
+[final] FAIL core-buildings :: place workerBunkhouse with 1x R via UI {"ok":false,"prompt":"Cannot place here","id":9,"type":"dragonPen","tx":490,"tz":490,"w":8,"d":8,"rotation":2}
+[final] PASS core-buildings :: place dragonFieldTraining with 3x R via UI {"ok":true,"prompt":"Click / F to place Dragon Field Training","id":10,"type":"dragonFieldTraining","tx":-29,"tz":-3,"w":6,"d":6,"rotation":3}
+[final] FAIL core :: phase crashed: page.evaluate: Target page, context or browser has been closed {"stack":"page.evaluate: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> /home/box/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakp
+=== phase core done in 47.3s ===
+
+=== [final] phase ui ===
+[final] FAIL ui :: phase crashed: page.goto: Target page, context or browser has been closed {"stack":"page.goto: Target page, context or browser has been closed\n    at boot (/workspace/dragon-ranch/scripts/playtest/lib.mjs:151:16)\n    at boot (/workspace/dragon-ranch/scripts/playtest/run.mjs:57:67)\n    at Module.run (/workspace/dragon-ranch/scripts/playtest/ui.mjs:8:9)\n    at /workspace/dragon-ranch/scripts/playtest/run.mjs:57:22\n    at async phase (/workspace/dragon-ranch/scripts/p
+=== phase ui done in 0.0s ===
+
+[final] 75 passed, 11 failed. Console msgs: 3. Results: /workspace/dragon-ranch/screenshots/playtest/results-final.json
+  console warning [.WebGL-0x6c400192600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+  console warning [.WebGL-0x6c400192600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+  console warning [.WebGL-0x6c400197400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)

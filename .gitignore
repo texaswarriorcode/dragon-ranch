@@ -26,3 +26,7 @@ blob-report/
 # Env
 .env
 .env.*
+
+# Playtest screenshots are large; only curated ones are committed (git add -f)
+screenshots/playtest/*.png
+screenshots/playtest/video-*/

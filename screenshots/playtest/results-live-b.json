@@ -1,0 +1,1113 @@
+{
+  "label": "live-b",
+  "base": "https://texaswarriorcode.github.io/dragon-ranch/",
+  "tests": [
+    {
+      "group": "input",
+      "name": "mouse events reach the 3D canvas (grid of points over the play area)",
+      "pass": false,
+      "severity": "critical",
+      "details": {
+        "topElementAtCentre": "div#fade.fade-overlay",
+        "pointsOnCanvas": 0,
+        "pointsTested": 40,
+        "blockers": {
+          "div#fade.fade-overlay": 40
+        }
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place workerBunkhouse rot0 via hotbar+mouse (0,-10)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Worker Bunkhouse",
+        "id": 1,
+        "type": "workerBunkhouse",
+        "tx": -2,
+        "tz": -15,
+        "w": 4,
+        "d": 10,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonPen rot0 via hotbar+mouse (12,-10)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Pen",
+        "id": 2,
+        "type": "dragonPen",
+        "tx": 8,
+        "tz": -14,
+        "w": 8,
+        "d": 8,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place breedingPen rot1 via hotbar+mouse (-12,-10)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Breeding Pen",
+        "id": 3,
+        "type": "breedingPen",
+        "tx": -16,
+        "tz": -14,
+        "w": 8,
+        "d": 8,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmhouse rot0 via hotbar+mouse (0,6)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 4,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": 3,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place workerBunkhouse rot1 via hotbar+mouse (0,20)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Worker Bunkhouse",
+        "id": 5,
+        "type": "workerBunkhouse",
+        "tx": -5,
+        "tz": 18,
+        "w": 10,
+        "d": 4,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonFieldTraining rot0 via hotbar+mouse (14,8)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Field Training",
+        "id": 6,
+        "type": "dragonFieldTraining",
+        "tx": 11,
+        "tz": 5,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "R rotation swaps bunkhouse footprint to 10x4",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "w": 10,
+        "d": 4
+      }
+    },
+    {
+      "group": "workers",
+      "name": "hire 4 Dragon Handlers with 200 starting coins (5th fails: no coins)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "workers": 4,
+        "coinsAfter": 0,
+        "lastToast": "Need 50 coins (have 0)"
+      }
+    },
+    {
+      "group": "workers",
+      "name": "hire up to capacity 8 across 2 bunkhouses; 9th refused",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "bunkAssignments": [
+          1,
+          1,
+          1,
+          1,
+          5,
+          5,
+          5,
+          5
+        ],
+        "lastToast": "Need a free bunk in a Worker Bunkhouse"
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers spawn outside building walls (not inside bunkhouse geometry)",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "spawn": [
+          {
+            "id": 1,
+            "x": -0.09,
+            "z": -12.14,
+            "insideOwnBunk": true
+          },
+          {
+            "id": 2,
+            "x": 4.84,
+            "z": -9.44,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 3,
+            "x": -0.03,
+            "z": -10.28,
+            "insideOwnBunk": true
+          },
+          {
+            "id": 4,
+            "x": 7.7,
+            "z": -5.16,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 5,
+            "x": 0.48,
+            "z": 16.06,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 6,
+            "x": 2.68,
+            "z": 16.61,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 7,
+            "x": 1.78,
+            "z": 20.45,
+            "insideOwnBunk": true
+          },
+          {
+            "id": 8,
+            "x": 1.53,
+            "z": 20.8,
+            "insideOwnBunk": true
+          }
+        ]
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers never walk inside buildings/pens (through walls/fences) over 45s",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "offenders": [
+          {
+            "id": 1,
+            "framesInside": {
+              "workerBunkhouse": 422
+            }
+          },
+          {
+            "id": 2,
+            "framesInside": {
+              "workerBunkhouse": 327
+            }
+          },
+          {
+            "id": 3,
+            "framesInside": {
+              "workerBunkhouse": 492
+            }
+          },
+          {
+            "id": 4,
+            "framesInside": {
+              "workerBunkhouse": 24
+            }
+          },
+          {
+            "id": 5,
+            "framesInside": {
+              "workerBunkhouse": 272
+            }
+          },
+          {
+            "id": 6,
+            "framesInside": {
+              "workerBunkhouse": 158
+            }
+          },
+          {
+            "id": 7,
+            "framesInside": {
+              "workerBunkhouse": 140,
+              "farmhouse": 50
+            }
+          },
+          {
+            "id": 8,
+            "framesInside": {
+              "workerBunkhouse": 333
+            }
+          }
+        ],
+        "frames": 492
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers stay inside world bounds",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "outOfWorld": 0
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers do not stack (pair distance < 0.5)",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "stackFrames": 32,
+        "minPairDist": 0.13
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers face walk direction, no spin jitter",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "spins": 25,
+        "facingErrFrames": 0,
+        "movingFrames": 2354
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers play a walk animation while moving (no sliding)",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "framesMovingWithoutLegSwing": 2354,
+        "movingFrames": 2354
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers keep moving (none frozen) and stay near home",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "paths": [
+          13.8,
+          22,
+          7.6,
+          32.7,
+          27.7,
+          31.3,
+          33,
+          20.2
+        ],
+        "maxBunkDist": [
+          7.4,
+          5.9,
+          3.8,
+          13.4,
+          7.8,
+          10.4,
+          14.7,
+          8.3
+        ]
+      }
+    },
+    {
+      "group": "missions",
+      "name": "F next to a handler opens Missions with handler preselected",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F to assign missions",
+        "open": true,
+        "sel": {
+          "workerId": "1",
+          "dragonId": "",
+          "buildingId": "",
+          "missionKey": ""
+        }
+      }
+    },
+    {
+      "group": "missions",
+      "name": "mission dropdown keeps focus after click (panel not rebuilt every frame)",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "activeElementAfter400ms": "BODY"
+      }
+    },
+    {
+      "group": "missions",
+      "name": "arrow keys in a focused dropdown do not move the player",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "playerMoved": 0.6,
+        "selectValueBefore": "",
+        "after": ""
+      }
+    },
+    {
+      "group": "missions",
+      "name": "Start mission registers with a human-speed click (120ms press)",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "selState": {
+          "workerId": "1",
+          "dragonId": "",
+          "buildingId": "",
+          "missionKey": ""
+        },
+        "startDisabled": true,
+        "activeMissions": 0
+      }
+    },
+    {
+      "group": "missions",
+      "name": "Start mission works with an instant click (fallback)",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "activeMissions": 0
+      }
+    },
+    {
+      "group": "persistence",
+      "name": "save/reload keeps workers, busy handler, in-progress mission, buildings, coins, pen dragons",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pre": {
+          "workers": 8,
+          "busy": [],
+          "missions": [],
+          "buildings": 6,
+          "coins": 99999,
+          "penDragons": [
+            12,
+            11,
+            10
+          ],
+          "inv": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        "post": {
+          "workers": 8,
+          "busy": [],
+          "hiddenBusy": true,
+          "missions": [],
+          "buildings": 6,
+          "coins": 99999,
+          "penDragons": [
+            12,
+            11,
+            10
+          ],
+          "inv": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        }
+      }
+    },
+    {
+      "group": "persistence",
+      "name": "dragon IDs stay unique after reload (no collision with pen/mission dragons)",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "newId": 10,
+        "collides": true,
+        "taken": [
+          12,
+          11,
+          10,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    },
+    {
+      "group": "persistence",
+      "name": "duplicate IDs → placing one dragon deletes its twin (data loss)",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "totalDragonsBefore": 13,
+        "totalAfter": 12
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "dragons stay inside pen fences over 40s (incl. rotated + world-corner pens)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "escapes": 0,
+        "worstOutside": 0,
+        "offenders": [],
+        "dragons": 16,
+        "frames": 264,
+        "pens": [
+          "dragonPen r0",
+          "breedingPen r0",
+          "dragonPen r1",
+          "breedingPen r3",
+          "dragonPen r2"
+        ]
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "dragons face their walking direction (no spin-in-place)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "faceErr": 0,
+        "moving": 2316,
+        "spinInPlace": 0
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "dragon grows (stage up + mesh scales up)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "id": 3,
+        "stageBefore": 0,
+        "stageAfter": 1,
+        "heightBefore": 0.46,
+        "heightAfter": 0.77
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "demo/world dragon IDs do not collide with inventory dragon IDs",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "clashingIds": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "pick up adult dragon (aim + F)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F to pick up adult dragon",
+        "inWorld": false,
+        "invCount": 9,
+        "invBefore": 8,
+        "dupIds": 2
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "place dragon back into pen (hotbar 8 + click)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F / click to place Common baby female",
+        "back": {
+          "penId": 7
+        },
+        "selectedDragon": 2
+      }
+    },
+    {
+      "group": "core-breeding",
+      "name": "adult pair lays an egg after breed timer",
+      "pass": true,
+      "severity": null,
+      "details": {}
+    },
+    {
+      "group": "core-breeding",
+      "name": "egg hatches into a baby in inventory (real 15s timer)",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "inv0": 7,
+        "inv1": 9
+      }
+    },
+    {
+      "group": "core-feeding",
+      "name": "feed baby dragonfruit (hotbar 9 + click) speeds growth",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F / click to feed",
+        "stageStartBefore": 277,
+        "after": -17763
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmhouse with 0x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 1,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": -3,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmPlot with 0x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farm Plot",
+        "id": 2,
+        "type": "farmPlot",
+        "tx": 8,
+        "tz": -2,
+        "w": 4,
+        "d": 4,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonPen with 1x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Pen",
+        "id": 3,
+        "type": "dragonPen",
+        "tx": 16,
+        "tz": -4,
+        "w": 8,
+        "d": 8,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place breedingPen with 2x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Breeding Pen",
+        "id": 4,
+        "type": "breedingPen",
+        "tx": 28,
+        "tz": -4,
+        "w": 8,
+        "d": 8,
+        "rotation": 2
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place workerBunkhouse with 1x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Worker Bunkhouse",
+        "id": 5,
+        "type": "workerBunkhouse",
+        "tx": -17,
+        "tz": -2,
+        "w": 10,
+        "d": 4,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonFieldTraining with 3x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Field Training",
+        "id": 6,
+        "type": "dragonFieldTraining",
+        "tx": -29,
+        "tz": -3,
+        "w": 6,
+        "d": 6,
+        "rotation": 3
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmhouse with 2x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 7,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": 13,
+        "w": 6,
+        "d": 6,
+        "rotation": 2
+      }
+    },
+    {
+      "group": "core-farming",
+      "name": "plant 4 seeds via hotbar 7 + click",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "seeds0": 20,
+        "crops": 4,
+        "seeds": 16
+      }
+    },
+    {
+      "group": "core-farming",
+      "name": "crops grow to stage 4 and harvest by click",
+      "pass": false,
+      "severity": "high",
+      "details": {
+        "stages": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "fruit0": 5,
+        "crops": 4,
+        "fruit": 5
+      }
+    },
+    {
+      "group": "core-rest",
+      "name": "F at farmhouse door rests (fade, time skip, energy refilled)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "restPrompt": "Press F to rest",
+        "gt0": 167000,
+        "resting": false,
+        "energy": 100,
+        "gameTime": 247950
+      }
+    },
+    {
+      "group": "core-rest",
+      "name": "rotated farmhouse: rest prompt at the actual door, not the back wall",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "atDoor": "",
+        "atBack": "Press F to rest"
+      }
+    },
+    {
+      "group": "core-market",
+      "name": "buy Worker Bunkhouse (75 coins) → inventory +1",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "inv0": {
+          "coins": 200,
+          "bunks": 98
+        },
+        "inv1": {
+          "coins": 125,
+          "bunks": 99
+        }
+      }
+    },
+    {
+      "group": "ui",
+      "name": "hotbar keys ignored while Marketplace is open",
+      "pass": false,
+      "severity": "low",
+      "details": {
+        "before": null,
+        "after": "farmhouse"
+      }
+    },
+    {
+      "group": "ui",
+      "name": "movement while Marketplace open (info: player can walk with panel open)",
+      "pass": null,
+      "severity": "medium",
+      "details": {
+        "moved": 2.4
+      }
+    },
+    {
+      "group": "ui",
+      "name": "panels do not overlap HUD (help/hotbar/inventory/day)",
+      "pass": false,
+      "severity": "low",
+      "details": {
+        "overlaps": {
+          "#market-panel": [
+            "help"
+          ],
+          "#dragon-panel": [],
+          "#mission-panel": []
+        },
+        "hud": {
+          "help": {
+            "x": 988,
+            "y": 12,
+            "w": 280,
+            "h": 261.828125
+          },
+          "hotbar": {
+            "x": 373,
+            "y": 612,
+            "w": 534,
+            "h": 90
+          },
+          "inv": {
+            "x": 18,
+            "y": 583,
+            "w": 162.171875,
+            "h": 119
+          },
+          "day": {
+            "x": 12,
+            "y": 12,
+            "w": 170,
+            "h": 76
+          }
+        }
+      }
+    },
+    {
+      "group": "ui",
+      "name": "Esc closes top panel first, then clears selection",
+      "pass": false,
+      "severity": "low",
+      "details": {
+        "afterFirstEsc": {
+          "missions": false,
+          "sel": null
+        },
+        "afterSecondEsc": {
+          "missions": false,
+          "sel": null
+        }
+      }
+    },
+    {
+      "group": "ui",
+      "name": "tapping E (camera rotate key) near the door does not trigger rest/interact",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "restingAfterE": true
+      }
+    },
+    {
+      "group": "ui",
+      "name": "tapping E with a build item selected does not place it",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "before": 6,
+        "after": 7
+      }
+    },
+    {
+      "group": "ui",
+      "name": "click on ripe crop near a handler harvests (does not hijack into Missions)",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "cropsBefore": 16,
+        "missionsOpen": true,
+        "crops": 16
+      }
+    },
+    {
+      "group": "ui",
+      "name": "held keys released on window blur (no stuck movement after alt-tab)",
+      "pass": false,
+      "severity": "medium",
+      "details": {
+        "movedAfterBlur": 4.2
+      }
+    }
+  ],
+  "console": [
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x325c0019f200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x325c0019f200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x325c0019f800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+    },
+    {
+      "type": "warning",
+      "text": "THREE.WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead."
+    }
+  ],
+  "metrics": {
+    "cssWorkaroundInjected": true,
+    "workerWander": [
+      {
+        "id": 1,
+        "inside": {
+          "workerBunkhouse": 422
+        },
+        "path": 13.8,
+        "spin": 4,
+        "faceErr": 0,
+        "movingFrames": 173,
+        "noAnimFrames": 173,
+        "maxBunkDist": 7.4,
+        "idleFrames": 318
+      },
+      {
+        "id": 2,
+        "inside": {
+          "workerBunkhouse": 327
+        },
+        "path": 22,
+        "spin": 4,
+        "faceErr": 0,
+        "movingFrames": 275,
+        "noAnimFrames": 275,
+        "maxBunkDist": 5.9,
+        "idleFrames": 216
+      },
+      {
+        "id": 3,
+        "inside": {
+          "workerBunkhouse": 492
+        },
+        "path": 7.6,
+        "spin": 4,
+        "faceErr": 0,
+        "movingFrames": 95,
+        "noAnimFrames": 95,
+        "maxBunkDist": 3.8,
+        "idleFrames": 396
+      },
+      {
+        "id": 4,
+        "inside": {
+          "workerBunkhouse": 24
+        },
+        "path": 32.7,
+        "spin": 2,
+        "faceErr": 0,
+        "movingFrames": 409,
+        "noAnimFrames": 409,
+        "maxBunkDist": 13.4,
+        "idleFrames": 82
+      },
+      {
+        "id": 5,
+        "inside": {
+          "workerBunkhouse": 272
+        },
+        "path": 27.7,
+        "spin": 3,
+        "faceErr": 0,
+        "movingFrames": 346,
+        "noAnimFrames": 346,
+        "maxBunkDist": 7.8,
+        "idleFrames": 145
+      },
+      {
+        "id": 6,
+        "inside": {
+          "workerBunkhouse": 158
+        },
+        "path": 31.3,
+        "spin": 4,
+        "faceErr": 0,
+        "movingFrames": 391,
+        "noAnimFrames": 391,
+        "maxBunkDist": 10.4,
+        "idleFrames": 100
+      },
+      {
+        "id": 7,
+        "inside": {
+          "workerBunkhouse": 140,
+          "farmhouse": 50
+        },
+        "path": 33,
+        "spin": 1,
+        "faceErr": 0,
+        "movingFrames": 412,
+        "noAnimFrames": 412,
+        "maxBunkDist": 14.7,
+        "idleFrames": 79
+      },
+      {
+        "id": 8,
+        "inside": {
+          "workerBunkhouse": 333
+        },
+        "path": 20.2,
+        "spin": 3,
+        "faceErr": 0,
+        "movingFrames": 253,
+        "noAnimFrames": 253,
+        "maxBunkDist": 8.3,
+        "idleFrames": 238
+      }
+    ],
+    "consoleCount": 21
+  },
+  "_canvasChecked": true
+}

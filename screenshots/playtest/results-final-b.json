@@ -1,0 +1,1022 @@
+{
+  "label": "final-b",
+  "base": "http://127.0.0.1:5173/dragon-ranch/",
+  "tests": [
+    {
+      "group": "input",
+      "name": "mouse events reach the 3D canvas (grid of points over the play area)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "topElementAtCentre": "canvas#game-canvas.",
+        "pointsOnCanvas": 40,
+        "pointsTested": 40,
+        "blockers": {}
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place workerBunkhouse rot0 via hotbar+mouse (0,-10)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Worker Bunkhouse",
+        "id": 1,
+        "type": "workerBunkhouse",
+        "tx": -2,
+        "tz": -15,
+        "w": 4,
+        "d": 10,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonPen rot0 via hotbar+mouse (12,-10)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Pen",
+        "id": 2,
+        "type": "dragonPen",
+        "tx": 8,
+        "tz": -14,
+        "w": 8,
+        "d": 8,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place breedingPen rot1 via hotbar+mouse (-12,-10)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Breeding Pen",
+        "id": 3,
+        "type": "breedingPen",
+        "tx": -16,
+        "tz": -14,
+        "w": 8,
+        "d": 8,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmhouse rot0 via hotbar+mouse (0,6)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 4,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": 3,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place workerBunkhouse rot1 via hotbar+mouse (0,20)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Worker Bunkhouse",
+        "id": 5,
+        "type": "workerBunkhouse",
+        "tx": -5,
+        "tz": 18,
+        "w": 10,
+        "d": 4,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonFieldTraining rot0 via hotbar+mouse (14,8)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Field Training",
+        "id": 6,
+        "type": "dragonFieldTraining",
+        "tx": 11,
+        "tz": 5,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "R rotation swaps bunkhouse footprint to 10x4",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "w": 10,
+        "d": 4
+      }
+    },
+    {
+      "group": "workers",
+      "name": "hire 4 Dragon Handlers with 200 starting coins (5th fails: no coins)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "workers": 4,
+        "coinsAfter": 0,
+        "lastToast": "Need 50 coins (have 0)"
+      }
+    },
+    {
+      "group": "workers",
+      "name": "hire up to capacity 8 across 2 bunkhouses; 9th refused",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "bunkAssignments": [
+          1,
+          1,
+          1,
+          1,
+          5,
+          5,
+          5,
+          5
+        ],
+        "lastToast": "Need a free bunk in a Worker Bunkhouse"
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers spawn outside building walls (not inside bunkhouse geometry)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "spawn": [
+          {
+            "id": 1,
+            "x": 0.55,
+            "z": -4.01,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 2,
+            "x": 7.61,
+            "z": -14.69,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 3,
+            "x": -7.59,
+            "z": -15.09,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 4,
+            "x": -5.33,
+            "z": -10.54,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 5,
+            "x": 5.86,
+            "z": 17.24,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 6,
+            "x": 5.55,
+            "z": 17.77,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 7,
+            "x": 6.48,
+            "z": 17.05,
+            "insideOwnBunk": false
+          },
+          {
+            "id": 8,
+            "x": 5.91,
+            "z": 22.44,
+            "insideOwnBunk": false
+          }
+        ]
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers never walk inside buildings/pens (through walls/fences) over 45s",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "offenders": [],
+        "frames": 445
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers stay inside world bounds",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "outOfWorld": 0
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers do not stack (pair distance < 0.5)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "stackFrames": 0,
+        "minPairDist": 0.6
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers face walk direction, no spin jitter",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "spins": 0,
+        "facingErrFrames": 9,
+        "movingFrames": 1876
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers play a walk animation while moving (no sliding)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "framesMovingWithoutLegSwing": 1,
+        "movingFrames": 1876
+      }
+    },
+    {
+      "group": "workers",
+      "name": "workers keep moving (none frozen) and stay near home",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "paths": [
+          23.8,
+          23.8,
+          19.7,
+          7.4,
+          14.2,
+          9.6,
+          21.9,
+          29.4
+        ],
+        "maxBunkDist": [
+          6.5,
+          13.5,
+          10,
+          8,
+          12.7,
+          7.6,
+          7.3,
+          14.9
+        ]
+      }
+    },
+    {
+      "group": "missions",
+      "name": "F next to a handler opens Missions with handler preselected",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F to assign missions",
+        "open": true,
+        "sel": {
+          "workerId": "1",
+          "dragonId": "",
+          "buildingId": "",
+          "missionKey": ""
+        }
+      }
+    },
+    {
+      "group": "missions",
+      "name": "mission dropdown keeps focus after click (panel not rebuilt every frame)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "activeElementAfter400ms": "ms-dragon"
+      }
+    },
+    {
+      "group": "missions",
+      "name": "arrow keys in a focused dropdown do not move the player",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "playerMoved": 0,
+        "selectValueBefore": "",
+        "after": ""
+      }
+    },
+    {
+      "group": "missions",
+      "name": "Start mission registers with a human-speed click (120ms press)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "selState": {
+          "workerId": "1",
+          "dragonId": "5",
+          "buildingId": "6",
+          "missionKey": "takeDragonForARun"
+        },
+        "startDisabled": false,
+        "activeMissions": 1
+      }
+    },
+    {
+      "group": "missions",
+      "name": "handler hidden & parked while on mission",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "before": {
+          "workerId": 1,
+          "vis": false,
+          "busy": true,
+          "x": -9.455713758913586,
+          "z": -4.637624494053643,
+          "dragon": {
+            "id": 5,
+            "sex": "male",
+            "stage": 2,
+            "rarity": "Uncommon",
+            "level": 1,
+            "xp": 0,
+            "missionRestUntil": 0
+          },
+          "coins": 99999
+        },
+        "after": {
+          "vis": false,
+          "x": -9.455713758913586,
+          "z": -4.637624494053643
+        }
+      }
+    },
+    {
+      "group": "missions",
+      "name": "mission completes: handler returns visible, +20 coins, dragon back with XP and 10-min rest",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "before": {
+          "coins": 99999,
+          "xp": 0,
+          "level": 1
+        },
+        "done": {
+          "active": 0,
+          "vis": true,
+          "busy": false,
+          "coins": 100019,
+          "dragon": {
+            "xp": 0,
+            "level": 2,
+            "restLeftMs": 598407
+          },
+          "toast": "Mission complete! +100 XP · +20 coins · leveled to 2!"
+        }
+      }
+    },
+    {
+      "group": "missions",
+      "name": "returned handler resumes wandering",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "p0": {
+          "x": -8.657884564945743,
+          "z": -4.578729865668504
+        },
+        "p1": {
+          "x": -4.0304752399322545,
+          "z": -4.237141021034718
+        }
+      }
+    },
+    {
+      "group": "persistence",
+      "name": "save/reload keeps workers, busy handler, in-progress mission, buildings, coins, pen dragons",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pre": {
+          "workers": 8,
+          "busy": [
+            1
+          ],
+          "missions": [
+            {
+              "key": "takeDragonForARun",
+              "workerId": 1,
+              "endsAt": 1791411533054
+            }
+          ],
+          "buildings": 6,
+          "coins": 100019,
+          "penDragons": [
+            12,
+            11,
+            10
+          ],
+          "inv": [
+            1,
+            2,
+            3,
+            4,
+            7,
+            8,
+            9,
+            5
+          ]
+        },
+        "post": {
+          "workers": 8,
+          "busy": [
+            1
+          ],
+          "hiddenBusy": true,
+          "missions": [
+            {
+              "key": "takeDragonForARun",
+              "workerId": 1,
+              "endsAt": 1791411533054
+            }
+          ],
+          "buildings": 6,
+          "coins": 100019,
+          "penDragons": [
+            12,
+            11,
+            10
+          ],
+          "inv": [
+            1,
+            2,
+            3,
+            4,
+            7,
+            8,
+            9,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "group": "persistence",
+      "name": "dragon IDs stay unique after reload (no collision with pen/mission dragons)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "newId": 13,
+        "collides": false,
+        "taken": [
+          12,
+          11,
+          10,
+          6,
+          1,
+          2,
+          3,
+          4,
+          7,
+          8,
+          9,
+          5
+        ]
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "dragons stay inside pen fences over 40s (incl. rotated + world-corner pens)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "escapes": 0,
+        "worstOutside": 0,
+        "offenders": [],
+        "dragons": 16,
+        "frames": 280,
+        "pens": [
+          "dragonPen r0",
+          "breedingPen r0",
+          "dragonPen r1",
+          "breedingPen r3",
+          "dragonPen r2"
+        ]
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "dragons face their walking direction (no spin-in-place)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "faceErr": 0,
+        "moving": 2333,
+        "spinInPlace": 0
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "dragon grows (stage up + mesh scales up)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "id": 11,
+        "stageBefore": 0,
+        "stageAfter": 2,
+        "heightBefore": 0.46,
+        "heightAfter": 1.18
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "demo/world dragon IDs do not collide with inventory dragon IDs",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "clashingIds": []
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "pick up adult dragon (aim + F)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F to pick up adult dragon",
+        "inWorld": false,
+        "invCount": 9,
+        "invBefore": 8,
+        "dupIds": 1
+      }
+    },
+    {
+      "group": "dragons",
+      "name": "place dragon back into pen (hotbar 8 + click)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F / click to place Rare adult male",
+        "back": {
+          "penId": 7
+        },
+        "selectedDragon": 8
+      }
+    },
+    {
+      "group": "core-breeding",
+      "name": "adult pair lays an egg after breed timer",
+      "pass": true,
+      "severity": null,
+      "details": {}
+    },
+    {
+      "group": "core-breeding",
+      "name": "egg hatches into a baby in inventory (real 15s timer)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "inv0": 8,
+        "inv1": 10,
+        "note": "second (rotated) breeding pen may hatch too"
+      }
+    },
+    {
+      "group": "core-feeding",
+      "name": "feed baby dragonfruit (hotbar 9 + click) speeds growth",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prompt": "Press F / click to feed",
+        "stageStartBefore": 289,
+        "after": -17875
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmhouse with 0x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 1,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": -3,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmPlot with 0x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farm Plot",
+        "id": 2,
+        "type": "farmPlot",
+        "tx": 8,
+        "tz": -2,
+        "w": 4,
+        "d": 4,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonPen with 1x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Pen",
+        "id": 3,
+        "type": "dragonPen",
+        "tx": 16,
+        "tz": -4,
+        "w": 8,
+        "d": 8,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place breedingPen with 2x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Breeding Pen",
+        "id": 4,
+        "type": "breedingPen",
+        "tx": 28,
+        "tz": -4,
+        "w": 8,
+        "d": 8,
+        "rotation": 2
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place workerBunkhouse with 1x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Worker Bunkhouse",
+        "id": 5,
+        "type": "workerBunkhouse",
+        "tx": -17,
+        "tz": -2,
+        "w": 10,
+        "d": 4,
+        "rotation": 1
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place dragonFieldTraining with 3x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Dragon Field Training",
+        "id": 6,
+        "type": "dragonFieldTraining",
+        "tx": -29,
+        "tz": -3,
+        "w": 6,
+        "d": 6,
+        "rotation": 3
+      }
+    },
+    {
+      "group": "core-buildings",
+      "name": "place farmhouse with 2x R via UI",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 7,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": 13,
+        "w": 6,
+        "d": 6,
+        "rotation": 2
+      }
+    },
+    {
+      "group": "core-farming",
+      "name": "plant 4 seeds via hotbar 7 + click",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "seeds0": 20,
+        "crops": 4,
+        "seeds": 16
+      }
+    },
+    {
+      "group": "core-farming",
+      "name": "crops grow to stage 4 and harvest by click",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "stages": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "fruit0": 5,
+        "crops": 0,
+        "fruit": 9
+      }
+    },
+    {
+      "group": "core-rest",
+      "name": "F at farmhouse door rests (fade, time skip, energy refilled)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "restPrompt": "Press F to rest",
+        "gt0": 166971,
+        "resting": false,
+        "energy": 100,
+        "gameTime": 247921
+      }
+    },
+    {
+      "group": "core-rest",
+      "name": "rotated farmhouse: rest prompt at the actual door, not the back wall",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "atDoor": "Press F to rest",
+        "atBack": ""
+      }
+    },
+    {
+      "group": "core-market",
+      "name": "buy Worker Bunkhouse (75 coins) → inventory +1",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "inv0": {
+          "coins": 200,
+          "bunks": 98
+        },
+        "inv1": {
+          "coins": 125,
+          "bunks": 99
+        }
+      }
+    },
+    {
+      "group": "ui",
+      "name": "hotbar keys ignored while Marketplace is open",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "before": null,
+        "after": null
+      }
+    },
+    {
+      "group": "ui",
+      "name": "movement while Marketplace open (info: player can walk with panel open)",
+      "pass": null,
+      "severity": "medium",
+      "details": {
+        "moved": 2.4
+      }
+    },
+    {
+      "group": "ui",
+      "name": "panels do not overlap HUD (help/hotbar/inventory/day)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "overlaps": {
+          "#market-panel": [],
+          "#dragon-panel": [],
+          "#mission-panel": []
+        },
+        "hud": {
+          "help": null,
+          "hotbar": {
+            "x": 373,
+            "y": 612,
+            "w": 534,
+            "h": 90
+          },
+          "inv": {
+            "x": 18,
+            "y": 583,
+            "w": 162.171875,
+            "h": 119
+          },
+          "day": {
+            "x": 12,
+            "y": 12,
+            "w": 170,
+            "h": 76
+          }
+        }
+      }
+    },
+    {
+      "group": "ui",
+      "name": "Esc closes top panel first, then clears selection",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "afterFirstEsc": {
+          "missions": false,
+          "sel": "dragonPen"
+        },
+        "afterSecondEsc": {
+          "missions": false,
+          "sel": null
+        }
+      }
+    },
+    {
+      "group": "ui",
+      "name": "tapping E (camera rotate key) near the door does not trigger rest/interact",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "restingAfterE": false
+      }
+    },
+    {
+      "group": "ui",
+      "name": "tapping E with a build item selected does not place it",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "before": 6,
+        "after": 6
+      }
+    },
+    {
+      "group": "ui",
+      "name": "click on ripe crop near a handler harvests (does not hijack into Missions)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "cropsBefore": 16,
+        "missionsOpen": false,
+        "crops": 15
+      }
+    },
+    {
+      "group": "ui",
+      "name": "held keys released on window blur (no stuck movement after alt-tab)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "movedAfterBlur": 0
+      }
+    }
+  ],
+  "console": [
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x3e74001a6600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x3e74001a6600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x3e74001ab400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    }
+  ],
+  "metrics": {
+    "workerWander": [
+      {
+        "id": 1,
+        "inside": {},
+        "path": 23.8,
+        "spin": 0,
+        "faceErr": 0,
+        "movingFrames": 297,
+        "noAnimFrames": 0,
+        "maxBunkDist": 6.5,
+        "idleFrames": 147
+      },
+      {
+        "id": 2,
+        "inside": {},
+        "path": 23.8,
+        "spin": 0,
+        "faceErr": 0,
+        "movingFrames": 298,
+        "noAnimFrames": 1,
+        "maxBunkDist": 13.5,
+        "idleFrames": 146
+      },
+      {
+        "id": 3,
+        "inside": {},
+        "path": 19.7,
+        "spin": 0,
+        "faceErr": 6,
+        "movingFrames": 248,
+        "noAnimFrames": 0,
+        "maxBunkDist": 10,
+        "idleFrames": 196
+      },
+      {
+        "id": 4,
+        "inside": {},
+        "path": 7.4,
+        "spin": 0,
+        "faceErr": 0,
+        "movingFrames": 93,
+        "noAnimFrames": 0,
+        "maxBunkDist": 8,
+        "idleFrames": 351
+      },
+      {
+        "id": 5,
+        "inside": {},
+        "path": 14.2,
+        "spin": 0,
+        "faceErr": 3,
+        "movingFrames": 179,
+        "noAnimFrames": 0,
+        "maxBunkDist": 12.7,
+        "idleFrames": 265
+      },
+      {
+        "id": 6,
+        "inside": {},
+        "path": 9.6,
+        "spin": 0,
+        "faceErr": 0,
+        "movingFrames": 120,
+        "noAnimFrames": 0,
+        "maxBunkDist": 7.6,
+        "idleFrames": 324
+      },
+      {
+        "id": 7,
+        "inside": {},
+        "path": 21.9,
+        "spin": 0,
+        "faceErr": 0,
+        "movingFrames": 274,
+        "noAnimFrames": 0,
+        "maxBunkDist": 7.3,
+        "idleFrames": 170
+      },
+      {
+        "id": 8,
+        "inside": {},
+        "path": 29.4,
+        "spin": 0,
+        "faceErr": 0,
+        "movingFrames": 367,
+        "noAnimFrames": 0,
+        "maxBunkDist": 14.9,
+        "idleFrames": 77
+      }
+    ],
+    "consoleCount": 3
+  },
+  "_canvasChecked": true
+}
