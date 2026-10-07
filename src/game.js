@@ -128,7 +128,7 @@ export class Game {
 
     window.addEventListener('resize', () => this._onResize());
     // Save when the tab is closed / reloaded / hidden so nothing since the last autosave is lost
-    const flush = () => { if (!this._resting) saveGame(this); };
+    const flush = () => { if (!this._resting && !this._saveDisabled) saveGame(this); };
     window.addEventListener('pagehide', flush);
     document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
 
@@ -278,6 +278,8 @@ export class Game {
   }
 
   newGame() {
+    // Stop the pagehide flush / autosave from writing the old game back while we reload
+    this._saveDisabled = true;
     clearSave();
     location.href = location.pathname;
   }
@@ -773,7 +775,7 @@ export class Game {
 
     // Real seconds (dt is clamped to 50ms, so game-time autosave stretched out at low FPS)
     this._autosaveAcc += this.timer.getDelta();
-    if (this._autosaveAcc > 8) {
+    if (this._autosaveAcc > 8 && !this._saveDisabled) {
       this._autosaveAcc = 0;
       saveGame(this);
     }
