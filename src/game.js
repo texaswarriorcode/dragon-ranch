@@ -27,7 +27,8 @@ const SOLID_BUILDINGS = new Set(['farmhouse', 'workerBunkhouse', 'dragonFieldTra
 export class Game {
   constructor(canvas, uiRoot) {
     this.canvas = canvas;
-    this.clock = new THREE.Clock();
+    this.timer = new THREE.Timer(); // THREE.Clock is deprecated
+    this.timer.connect(document);
     this.gameTime = DAY.lengthMs * 0.3;
     this.creative = false;
     this.inventory = defaultInventory();
@@ -41,7 +42,7 @@ export class Game {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap; // PCFSoftShadowMap was removed in r18x
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     this.scene = new THREE.Scene();
@@ -371,7 +372,8 @@ export class Game {
       return;
     }
 
-    const dt = Math.min(this.clock.getDelta(), 0.05);
+    this.timer.update();
+    const dt = Math.min(this.timer.getDelta(), 0.05);
     const now = performance.now();
     this.gameTime += dt * 1000;
 
@@ -432,7 +434,7 @@ export class Game {
     if (this.player.moving) {
       this._spendEnergy(PLAYER.energyDrainPerSecMoving * dt);
     }
-    this.world.updateGrass(this.player.position, this.clock.elapsedTime);
+    this.world.updateGrass(this.player.position, this.timer.getElapsed());
 
     this._updateLighting();
     this.ui.updateDay(this.gameTime, DAY.lengthMs);
