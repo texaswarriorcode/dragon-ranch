@@ -110,10 +110,14 @@ export class Player {
       // Colliders we already overlap (e.g. something was placed on top of us) are ignored
       // so the player can always walk out instead of being stuck forever.
       const blocking = collisions.filter((c) => !this._overlaps(pos.x, pos.z, r, c));
-      if (!this._hitsAny(tryX, pos.z, r, blocking)) pos.x = tryX;
-      if (!this._hitsAny(pos.x, tryZ, r, blocking)) pos.z = tryZ;
-
-      world.clampPosition(pos, 1.5);
+      // Owned land is a union of regions (can be L-shaped): test each axis move against it.
+      // If we're somehow off owned land (old save), let the player move freely back.
+      const m = 1.5;
+      const onLand = world.canOccupy(pos.x, pos.z, m);
+      const nx = onLand ? world.moveAxis(pos.x, tryX, pos.z, 'x', m) : tryX;
+      if (!this._hitsAny(nx, pos.z, r, blocking)) pos.x = nx;
+      const nz = onLand ? world.moveAxis(pos.z, tryZ, pos.x, 'z', m) : tryZ;
+      if (!this._hitsAny(pos.x, nz, r, blocking)) pos.z = nz;
 
       this.facing = Math.atan2(wish.x, wish.z);
       this.mesh.rotation.y = this.facing;

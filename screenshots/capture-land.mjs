@@ -1,0 +1,20 @@
+// Map expansions screenshot (dev server on :5174): node screenshots/capture-land.mjs
+import { launch, frames, setPlayer } from '../scripts/playtest/lib.mjs';
+const { browser, context } = await launch({});
+const page = await context.newPage();
+const errs = []; page.on('pageerror', (e) => errs.push(String(e)));
+await page.goto('http://127.0.0.1:5174/', { waitUntil: 'load' });
+await page.waitForFunction(() => window.__dragonRanch?.renderer); await page.waitForTimeout(1500);
+await page.evaluate(() => { window.__dragonRanch._saveDisabled = true; localStorage.clear(); });
+await page.goto('http://127.0.0.1:5174/', { waitUntil: 'load' });
+await page.waitForFunction(() => window.__dragonRanch?.renderer);
+await page.waitForTimeout(800);
+await page.evaluate(() => { const g = window.__dragonRanch; g.land.unlock('N'); g.land.unlock('E');
+  g.buildings.place('farmhouse', 486, -540, 1); g.buildings.place('farmPlot', 476, -530, 0); g.buildings.place('dragonPen', 470, -560, 0); });
+await page.waitForTimeout(1700);
+await setPlayer(page, 478, -520, 0);
+await page.evaluate(() => { const g = window.__dragonRanch; g.followCam.distance = 50; g.followCam.pitch = 0.7; g.followCam.yaw = 0.5; });
+await frames(page, 10);
+await page.screenshot({ path: new URL('./27-map-expansions-building.png', import.meta.url).pathname });
+console.log('errors', errs);
+await browser.close();

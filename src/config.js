@@ -1,8 +1,31 @@
 /** Central game timing and balance config — easy to tune for demos. */
 
 export const WORLD = {
-  size: 1000,
+  size: 1000, // the original (home) land region
   half: 500,
+};
+
+/**
+ * Map expansions: the home region is the centre of a 3×3 grid of equal regions
+ * (each WORLD.size square). North is −z (up the screen at the default camera).
+ * Price depends on how many expansions you already own, not which one.
+ */
+export const LAND = {
+  regionSize: 1000,
+  expansionPrices: [0, 1000, 10000, 20000, 30000, 40000, 50000, 60000],
+  // Expansions must share an edge with land you already own (corners need a side first)
+  requireAdjacent: true,
+  regions: [
+    { id: 'NW', name: 'North-West', rx: -1, rz: -1 },
+    { id: 'N', name: 'North', rx: 0, rz: -1 },
+    { id: 'NE', name: 'North-East', rx: 1, rz: -1 },
+    { id: 'W', name: 'West', rx: -1, rz: 0 },
+    { id: 'C', name: 'Home', rx: 0, rz: 0 },
+    { id: 'E', name: 'East', rx: 1, rz: 0 },
+    { id: 'SW', name: 'South-West', rx: -1, rz: 1 },
+    { id: 'S', name: 'South', rx: 0, rz: 1 },
+    { id: 'SE', name: 'South-East', rx: 1, rz: 1 },
+  ],
 };
 
 export const PLAYER = {

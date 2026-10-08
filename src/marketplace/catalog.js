@@ -16,6 +16,7 @@ export const MARKETPLACE_TABS = [
   { id: 'farmWorkers', label: 'Farm Workers' },
   { id: 'farmBuildings', label: 'Farm Buildings' },
   { id: 'dragonDevelopment', label: 'Dragon Development' },
+  { id: 'land', label: 'Map Expansions' },
 ];
 
 function stubs(prefix, n = 2) {
@@ -65,6 +66,9 @@ export const MARKETPLACE_CATALOG = {
     ...stubs('dragonDevelopment', 2),
   ],
 };
+
+// Map expansions are generated from LAND config + ownership (see ui._renderLandBody)
+MARKETPLACE_CATALOG.land = [];
 
 export function getActiveListings(category) {
   const list = MARKETPLACE_CATALOG[category] || [];

@@ -105,6 +105,7 @@ export function saveGame(state) {
       coins: state.coins,
       workers: state.workers?.serialize?.() ?? state.workers ?? [],
       missions: state.missions?.serialize?.() ?? [],
+      land: state.land?.serialize?.() ?? ['C'],
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     return true;

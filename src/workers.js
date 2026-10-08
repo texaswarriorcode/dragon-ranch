@@ -165,7 +165,7 @@ export class WorkerManager {
       else if (side === 1) { x = box.minX - 0.5 + u * (box.maxX - box.minX + 1); z = box.maxZ + gap; }
       else if (side === 2) { x = box.minX - gap; z = box.minZ - 0.5 + u * (box.maxZ - box.minZ + 1); }
       else { x = box.maxX + gap; z = box.minZ - 0.5 + u * (box.maxZ - box.minZ + 1); }
-      if (Math.abs(x) > WORLD_LIMIT - 1 || Math.abs(z) > WORLD_LIMIT - 1) continue;
+      if (this.land ? !this.land.canOccupy(x, z, 1) : Math.abs(x) > WORLD_LIMIT - 1 || Math.abs(z) > WORLD_LIMIT - 1) continue;
       if (obstacles.some((o) => pointInBox(x, z, o, WORKER_RADIUS + 0.25))) continue;
       if (avoid.some((p) => Math.hypot(p.x - x, p.z - z) < 1.0)) continue;
       return { x, z };
@@ -285,7 +285,9 @@ export class WorkerManager {
           const ox0 = w.x, oz0 = w.z;
           // Axis-separated collision as a safety net (slide along walls/fences)
           const crowd = this.workers.filter((o) => o !== w && !o.busyMission && Math.hypot(o.x - ox0, o.z - oz0) < 1.5);
+          const offLand = (x, z) => (this.land ? !this.land.canOccupy(x, z, WORKER_RADIUS) : false);
           const blocked = (x, z) =>
+            offLand(x, z) ||
             obstacles.some((o) => !pointInBox(ox0, oz0, o, WORKER_RADIUS) && pointInBox(x, z, o, WORKER_RADIUS)) ||
             // personal space: never step closer than 0.6 to another handler
             crowd.some((o) => {
@@ -294,8 +296,10 @@ export class WorkerManager {
             });
           if (!blocked(nx, w.z)) w.x = nx;
           if (!blocked(w.x, nz)) w.z = nz;
-          w.x = Math.max(-WORLD_LIMIT, Math.min(WORLD_LIMIT, w.x));
-          w.z = Math.max(-WORLD_LIMIT, Math.min(WORLD_LIMIT, w.z));
+          if (!this.land) {
+            w.x = Math.max(-WORLD_LIMIT, Math.min(WORLD_LIMIT, w.x));
+            w.z = Math.max(-WORLD_LIMIT, Math.min(WORLD_LIMIT, w.z));
+          }
           const moved = Math.hypot(w.x - ox0, w.z - oz0);
           moving = moved > step * 0.2;
           w.stuckTime = moving ? 0 : (w.stuckTime || 0) + dt;

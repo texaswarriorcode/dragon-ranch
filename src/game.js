@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import {
   DAY, BUILDINGS, DRAGONS, PLAYER, BREEDING, REST, RARITY,
-  ECONOMY, DRAGON_STATS, MISSIONS,
+  ECONOMY, DRAGON_STATS, MISSIONS, LAND,
 } from './config.js';
 import { World } from './world.js';
+import { LandManager } from './land.js';
 import { Player } from './player.js';
 import { FollowCamera } from './camera.js';
 import { Input } from './input.js';
@@ -68,13 +69,18 @@ export class Game {
     this.amb = new THREE.AmbientLight(0xffffff, 0.25);
     this.scene.add(this.amb);
 
-    this.world = new World(this.scene);
+    // Owned land: home region + bought map expansions (3×3 grid of 1000×1000 regions)
+    this.land = new LandManager();
+    this.world = new World(this.scene, this.land);
+    this.land.onChange = (ids) => this.world.refreshLand(ids);
     this.player = new Player(this.scene);
     this.input = new Input(canvas);
     this.buildings = new BuildingManager(this.scene);
     this.crops = new CropManager(this.scene);
     this.dragons = new DragonManager(this.scene);
     this.workers = new WorkerManager(this.scene);
+    this.buildings.land = this.land;
+    this.workers.land = this.land;
     this.missions = new MissionManager();
     this.ui = new UI(uiRoot);
     this.ui.coins = this.coins;
@@ -94,6 +100,13 @@ export class Game {
       this.ui.toast(`Spawned ${opts.rarity} ${opts.sex} ${DRAGONS.stages[opts.stage].name}`);
     };
     this.ui.onPurchase = (listing) => this._purchase(listing);
+    this.ui.onGetLand = () => this._landState();
+    this.ui.onUnlockAllLand = () => {
+      if (!this.creative) return 0;
+      const added = this.land.unlockAll();
+      if (added.length) saveGame(this);
+      return added.length;
+    };
     this.ui.onGetMissionOptions = () => this._missionOptions();
     this.ui.onStartMission = (sel) => this._startMission(sel);
 
@@ -243,6 +256,7 @@ export class Game {
     this.inventory = data.inventory || defaultInventory();
     this.gameTime = data.gameTime ?? this.gameTime;
     this.creative = !!data.creative;
+    this.land.deserialize(data.land); // old saves (no `land`) → home region only
     this.energy = data.player?.energy ?? PLAYER.energyMax;
     this.coins = data.coins ?? ECONOMY.startingCoins;
     this.selectedDragonId = data.selectedDragonId ?? this.inventory.dragons[0]?.id ?? null;
@@ -459,6 +473,7 @@ export class Game {
       this._spendEnergy(PLAYER.energyDrainPerSecMoving * dt);
     }
     this.world.updateGrass(this.player.position, this.timer.getElapsed());
+    this.world.update(dt);
 
     this._updateLighting();
     this.ui.updateDay(this.gameTime, DAY.lengthMs);
@@ -595,7 +610,9 @@ export class Game {
                 ? 'None left'
                 : onPlayer
                   ? 'You are standing there — step aside'
-                  : 'Cannot place here';
+                  : !this.land.isRectOwned(gtx, gtz, gtx + w, gtz + d)
+                    ? 'Land not owned — buy a Map Expansion (Market → Map Expansions)'
+                    : 'Cannot place here';
           if (valid && this.input.interactKey) {
             const placed = this.buildings.place(selected, gtx, gtz, this.buildings.ghostRot);
             if (placed) {
@@ -837,6 +854,35 @@ export class Game {
     this.ui.updateInventory(this.inventory, this.selectedDragonId);
   }
 
+  _landState() {
+    return {
+      regions: LAND.regions.map((r) => ({ ...r, ...this.land.status(r.id) })),
+      owned: this.land.expansionsOwned,
+      total: this.land.totalExpansions,
+      nextPrice: this.land.nextPrice(),
+      prices: LAND.expansionPrices.slice(0, this.land.totalExpansions),
+      creative: this.creative,
+    };
+  }
+
+  _buyLand(id, { coins, creative }) {
+    const st = this.land.status(id);
+    if (st.status === 'owned') return { ok: false, message: 'Already owned' };
+    if (st.status === 'locked') return { ok: false, message: st.reason };
+    const price = this.land.nextPrice();
+    if (price == null) return { ok: false, message: 'All land owned' };
+    if (!creative && coins < price) return { ok: false, message: `Need ${price.toLocaleString()} coins` };
+    const res = this.land.unlock(id);
+    if (!res.ok) return res;
+    const name = LAND.regions.find((r) => r.id === id).name;
+    const paid = creative ? 0 : price;
+    return {
+      ok: true,
+      coins: coins - paid,
+      message: `${name} expansion unlocked${paid ? ` for ${paid.toLocaleString()} coins` : price === 0 ? ' — free!' : ''}`,
+    };
+  }
+
   _purchase(listing) {
     const bunk = this.workers.findFreeBunk(
       this.buildings,
@@ -846,6 +892,7 @@ export class Game {
       coins: this.coins,
       inventory: this.inventory,
       creative: this.creative,
+      onBuyLand: (id, c) => this._buyLand(id, c),
       bunkCapacity: this.buildings.bunkCapacity(),
       workerCount: this.workers.count(),
       onHireWorker: (typeId) => {

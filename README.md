@@ -63,11 +63,25 @@ node scripts/test-breeding-odds.mjs
 
 ## Marketplace
 
-Open with **M** or the **Marketplace** button. Tabs: Farm Plots, Dragons, Dragon Buildings, Farm Workers, Farm Buildings, **Dragon Development**.
+Open with **M** or the **Marketplace** button. Tabs: Farm Plots, Dragons, Dragon Buildings, Farm Workers, Farm Buildings, **Dragon Development**, **Map Expansions**.
 
 Starting coins: **200**. Buy **Dragon Handler** (50) under Farm Workers (needs free bunk) and **Worker Bunkhouse** (75, 4×10, holds 4 workers) under Farm Buildings.
 
 Catalog data lives in `src/marketplace/catalog.js`. Real purchases via `tryPurchase()` in `src/marketplace/marketplace.js` (bunkhouses + Dragon Handlers). HUD shows Workers used/capacity and coins.
+
+## Map expansions
+
+Your ranch starts on the 1000×1000 home region in the middle of a 3×3 grid. Marketplace → **Map Expansions** sells the 8 surrounding regions (N, NE, E, SE, S, SW, W, NW), each the same size as home, so the full map is 3000×3000.
+
+| Purchase # | 1st | 2nd | 3rd | 4th | 5th | 6th | 7th | 8th |
+|---|---|---|---|---|---|---|---|---|
+| Price (coins) | Free | 1,000 | 10,000 | 20,000 | 30,000 | 40,000 | 50,000 | 60,000 |
+
+- The price depends on how many expansions you own, not which one. The table lives in `LAND.expansionPrices` in `src/config.js`.
+- An expansion must share an edge with land you own. N/E/S/W are available first; corners show e.g. "Buy North or East first".
+- Unowned land is visible but darkened, with no grass, and a fence plus gold line marks your border. Buying one fades the fog away.
+- Player movement, building placement, and worker wandering are limited to the union of owned regions, so L-shapes work.
+- Owned regions are saved; old saves load as home-only. In Creative mode, the tab has an **Unlock all** button.
 
 ## Dragon stats
 
@@ -101,9 +115,12 @@ src/
   dragons.js    dragons, auras, eggs, breeding state
   buildings.js  farmhouse, plot, pens
   crops.js      crop growth
+  land.js       owned land / map expansions (bounds, adjacency, save)
+  world.js      ground, grass, fog over unowned land, border fences
   game.js       orchestration
   ui.js         HUD, dragon panel, fade
   …
 scripts/
   test-breeding-odds.mjs
+  playtest/     Playwright playtest (node scripts/playtest/run.mjs <url> <label> [phases])
 ```

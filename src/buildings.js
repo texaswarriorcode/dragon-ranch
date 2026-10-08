@@ -740,8 +740,13 @@ export class BuildingManager {
 
   canPlace(type, tx, tz, rotation) {
     const { w, d } = footprintFor(type, rotation);
-    const half = WORLD.half;
-    if (tx < -half || tz < -half || tx + w > half || tz + d > half) return false;
+    if (this.land) {
+      // Must sit entirely on owned land (home + bought expansions, any shape)
+      if (!this.land.isRectOwned(tx, tz, tx + w, tz + d)) return false;
+    } else {
+      const half = WORLD.half;
+      if (tx < -half || tz < -half || tx + w > half || tz + d > half) return false;
+    }
     if (this.occupies(tx, tz, w, d)) return false;
     return true;
   }

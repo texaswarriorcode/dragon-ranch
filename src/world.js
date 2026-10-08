@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { WORLD } from './config.js';
+import { WORLD, LAND } from './config.js';
 
 /** Procedural tiling grass texture via canvas. */
 function makeGrassTexture() {
@@ -39,11 +39,14 @@ function makeGrassTexture() {
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(WORLD.size / 8, WORLD.size / 8);
+  tex.repeat.set(LAND.regionSize / 8, LAND.regionSize / 8); // per region tile
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 4;
   return tex;
 }
+
+const FOG_TINT = new THREE.Color(0.42, 0.45, 0.42); // unowned land: darker, desaturated
+const WHITE = new THREE.Color(1, 1, 1);
 
 function makeTuftGeometry() {
   const geo = new THREE.BufferGeometry();
@@ -66,26 +69,40 @@ function makeTuftGeometry() {
 }
 
 export class World {
-  constructor(scene) {
+  constructor(scene, land) {
     this.scene = scene;
+    this.land = land;
     this.size = WORLD.size;
     this.half = WORLD.half;
+    this.fullHalf = (LAND.regionSize * 3) / 2; // whole 3×3 map
 
-    // Ground plane
-    const groundGeo = new THREE.PlaneGeometry(this.size, this.size, 1, 1);
-    groundGeo.rotateX(-Math.PI / 2);
-    const groundMat = new THREE.MeshStandardMaterial({
-      map: makeGrassTexture(),
-      roughness: 0.95,
-      metalness: 0,
-    });
-    this.ground = new THREE.Mesh(groundGeo, groundMat);
-    this.ground.receiveShadow = true;
+    // Ground: one quad per 1000×1000 region (9 draw calls, no overdraw). Unowned regions
+    // share the same grass texture with a darkened material instead of a transparent overlay.
+    const grass = makeGrassTexture();
+    this._groundMat = new THREE.MeshStandardMaterial({ map: grass, roughness: 0.95, metalness: 0 });
+    this._fogMat = new THREE.MeshStandardMaterial({ map: grass, roughness: 1, metalness: 0, color: FOG_TINT });
+    const tileGeo = new THREE.PlaneGeometry(LAND.regionSize, LAND.regionSize, 1, 1);
+    tileGeo.rotateX(-Math.PI / 2);
+    this.ground = new THREE.Group();
     this.ground.name = 'ground';
+    this._tiles = new Map(); // regionId -> mesh
+    for (const r of LAND.regions) {
+      const m = new THREE.Mesh(tileGeo, this._groundMat);
+      m.position.set(r.rx * LAND.regionSize, 0, r.rz * LAND.regionSize);
+      m.receiveShadow = true;
+      m.name = `ground-${r.id}`;
+      this.ground.add(m);
+      this._tiles.set(r.id, m);
+    }
     scene.add(this.ground);
 
-    // Soft edge border walls (invisible collision boxes + visual fence posts sparingly)
-    this._addBorders(scene);
+    // Unowned (fogged) regions + owned-land border fence / glow line (rebuilt on purchase)
+    this._fogged = new Set();
+    this._fading = [];
+    this.borderGroup = new THREE.Group();
+    this.borderGroup.name = 'landBorders';
+    scene.add(this.borderGroup);
+    this.refreshLand();
 
     // Instanced grass tufts near player
     this.tuftCount = 800;
@@ -117,37 +134,111 @@ export class World {
     this._mouse = new THREE.Vector2();
   }
 
-  _addBorders(scene) {
-    const edge = this.half;
-    const h = 1.2;
-    const mat = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: 0.85 });
-    const posts = [];
-    // Corner markers + mid-edge posts every 50 units
-    for (let i = -edge; i <= edge; i += 50) {
-      posts.push([i, -edge], [i, edge], [-edge, i], [edge, i]);
+  /** Rebuild overlays + borders from land ownership. `revealed` = ids just bought (fade out). */
+  refreshLand(revealed = null) {
+    const land = this.land;
+    for (const r of LAND.regions) {
+      const owned = !land || land.isOwned(r.id);
+      const tile = this._tiles.get(r.id);
+      if (!owned && !this._fogged.has(r.id)) {
+        this._fogged.add(r.id);
+        tile.material = this._fogMat;
+      } else if (owned && this._fogged.has(r.id)) {
+        this._fogged.delete(r.id);
+        if (revealed && revealed.includes(r.id)) {
+          // short reveal: brighten the darkened tile back to normal grass
+          tile.material = this._fogMat.clone();
+          this._fading.push({ mesh: tile, t: 0 });
+        } else {
+          tile.material = this._groundMat;
+        }
+      }
     }
-    const geo = new THREE.CylinderGeometry(0.25, 0.3, h, 6);
-    const inst = new THREE.InstancedMesh(geo, mat, posts.length);
-    const dummy = new THREE.Object3D();
-    posts.forEach((p, idx) => {
-      dummy.position.set(p[0], h / 2, p[1]);
-      dummy.updateMatrix();
-      inst.setMatrixAt(idx, dummy.matrix);
-    });
-    inst.castShadow = true;
-    scene.add(inst);
+    this._buildBorders();
+  }
 
-    // Visual edge fence rails
-    const railMat = new THREE.MeshStandardMaterial({ color: 0x6b5040 });
-    const makeRail = (w, d, x, z) => {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.15, d), railMat);
-      m.position.set(x, 0.7, z);
-      scene.add(m);
-    };
-    makeRail(this.size, 0.2, 0, -edge);
-    makeRail(this.size, 0.2, 0, edge);
-    makeRail(0.2, this.size, -edge, 0);
-    makeRail(0.2, this.size, edge, 0);
+  /** Fence posts + rail along every owned edge; a glowing gold line where the
+   *  neighbouring land is buyable/locked (not the outer map edge). */
+  _buildBorders() {
+    const g = this.borderGroup;
+    for (const c of [...g.children]) {
+      g.remove(c);
+      c.geometry?.dispose?.();
+    }
+    const S = LAND.regionSize;
+    const H = S / 2;
+    const segs = []; // { x0, z0, x1, z1, glow }
+    const owned = (rx, rz) => (this.land ? this.land.ownedCell(rx, rz) : rx === 0 && rz === 0);
+    const inMap = (rx, rz) => Math.abs(rx) <= 1 && Math.abs(rz) <= 1;
+    for (const r of LAND.regions) {
+      if (!owned(r.rx, r.rz)) continue;
+      const cx = r.rx * S, cz = r.rz * S;
+      const edges = [
+        [r.rx, r.rz - 1, cx - H, cz - H, cx + H, cz - H],
+        [r.rx, r.rz + 1, cx - H, cz + H, cx + H, cz + H],
+        [r.rx - 1, r.rz, cx - H, cz - H, cx - H, cz + H],
+        [r.rx + 1, r.rz, cx + H, cz - H, cx + H, cz + H],
+      ];
+      for (const [nx, nz, x0, z0, x1, z1] of edges) {
+        if (owned(nx, nz)) continue;
+        segs.push({ x0, z0, x1, z1, glow: inMap(nx, nz) });
+      }
+    }
+    const postH = 1.2;
+    const posts = [];
+    for (const s of segs) {
+      const len = Math.hypot(s.x1 - s.x0, s.z1 - s.z0);
+      for (let d = 0; d <= len; d += 50) {
+        posts.push([s.x0 + ((s.x1 - s.x0) * d) / len, s.z0 + ((s.z1 - s.z0) * d) / len]);
+      }
+    }
+    const postMat = this._postMat || (this._postMat = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: 0.85 }));
+    const railMat = this._railMat || (this._railMat = new THREE.MeshStandardMaterial({ color: 0x6b5040 }));
+    const glowMat = this._glowMat || (this._glowMat = new THREE.MeshBasicMaterial({
+      color: 0xffd54a, transparent: true, opacity: 0.85, depthWrite: false,
+      polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
+    }));
+    if (posts.length) {
+      const inst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.25, 0.3, postH, 6), postMat, posts.length);
+      const dummy = new THREE.Object3D();
+      posts.forEach((p, i) => {
+        dummy.position.set(p[0], postH / 2, p[1]);
+        dummy.updateMatrix();
+        inst.setMatrixAt(i, dummy.matrix);
+      });
+      inst.castShadow = true;
+      g.add(inst);
+    }
+    for (const s of segs) {
+      const horiz = s.z0 === s.z1;
+      const len = Math.hypot(s.x1 - s.x0, s.z1 - s.z0);
+      const mx = (s.x0 + s.x1) / 2, mz = (s.z0 + s.z1) / 2;
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(horiz ? len : 0.2, 0.15, horiz ? 0.2 : len), railMat);
+      rail.position.set(mx, 0.7, mz);
+      g.add(rail);
+      if (s.glow) {
+        const strip = new THREE.Mesh(new THREE.PlaneGeometry(horiz ? len : 0.5, horiz ? 0.5 : len), glowMat);
+        strip.rotation.x = -Math.PI / 2;
+        strip.position.set(mx, 0.02, mz);
+        strip.renderOrder = 2;
+        g.add(strip);
+      }
+    }
+    this.borderSegments = segs;
+  }
+
+  /** Per-frame: land reveal fades. */
+  update(dt) {
+    for (let i = this._fading.length - 1; i >= 0; i--) {
+      const f = this._fading[i];
+      f.t += dt;
+      f.mesh.material.color.copy(FOG_TINT).lerp(WHITE, Math.min(1, f.t / 1.5));
+      if (f.t >= 1.5) {
+        f.mesh.material.dispose();
+        f.mesh.material = this._groundMat;
+        this._fading.splice(i, 1);
+      }
+    }
   }
 
   _makeGridOverlay() {
@@ -186,7 +277,8 @@ export class World {
       const sz = ((seed * (i + 7) * 1664525 + 1013904223) >>> 0) / 0xffffffff;
       const x = playerPos.x + (sx - 0.5) * R * 2;
       const z = playerPos.z + (sz - 0.5) * R * 2;
-      if (Math.abs(x) > this.half - 1 || Math.abs(z) > this.half - 1) {
+      // tufts only on owned land (unowned land reads as bare / unavailable)
+      if (this.land ? !this.land.isPointOwned(x, z) : Math.abs(x) > this.half - 1 || Math.abs(z) > this.half - 1) {
         this._dummy.scale.set(0, 0, 0);
       } else {
         const h = 0.6 + (sx * 0.8);
@@ -209,7 +301,28 @@ export class World {
     this.gridHelper.visible = false;
   }
 
-  /** Clamp position to world bounds (with margin for player radius). */
+  /** Can a body of half-size `margin` stand at (x, z)? (owned land only) */
+  canOccupy(x, z, margin = 1) {
+    if (this.land) return this.land.canOccupy(x, z, margin);
+    const lim = this.half - margin;
+    return Math.abs(x) <= lim && Math.abs(z) <= lim;
+  }
+
+  /** Move one axis from `from` toward `to` (other axis fixed at `other`) staying on owned land.
+   *  If the full move would leave owned land, stop flush at the crossed region edge. */
+  moveAxis(from, to, other, axis, m) {
+    const ok = (v) => (axis === 'x' ? this.canOccupy(v, other, m) : this.canOccupy(other, v, m));
+    if (ok(to)) return to;
+    if (to === from) return from;
+    const S = LAND.regionSize, H = S / 2;
+    const dir = Math.sign(to - from);
+    const edge = dir > 0 ? Math.floor((from + m + H) / S) * S + H : Math.ceil((from - m - H) / S) * S - H;
+    const cand = edge - dir * m;
+    if ((dir > 0 ? cand >= from && cand <= to : cand <= from && cand >= to) && ok(cand - dir * 1e-6)) return cand;
+    return from;
+  }
+
+  /** Clamp position to the home region bounds (legacy helper). */
   clampPosition(pos, margin = 1) {
     const lim = this.half - margin;
     pos.x = Math.max(-lim, Math.min(lim, pos.x));
@@ -231,6 +344,7 @@ export class World {
   }
 
   inBounds(tx, tz, w = 1, d = 1) {
+    if (this.land) return this.land.isRectOwned(tx, tz, tx + w, tz + d);
     const half = this.half;
     return (
       tx >= -half &&

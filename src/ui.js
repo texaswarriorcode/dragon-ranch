@@ -378,8 +378,75 @@ export class UI {
     }
   }
 
+  /** 3×3 minimap: owned / available / locked; `focus` outlines one region. */
+  _landMinimap(regions, focus = null, big = false) {
+    let html = `<div class="land-map${big ? ' big' : ''}">`;
+    for (const r of regions) {
+      const label = big ? (r.id === 'C' ? 'Home' : r.id) : '';
+      html += `<div class="land-cell ${r.status}${r.id === focus ? ' focus' : ''}" title="${r.name}: ${r.status}">${label}</div>`;
+    }
+    return html + '</div>';
+  }
+
+  _renderLandBody() {
+    const st = this.onGetLand?.();
+    if (!st) {
+      this.marketBody.innerHTML = '<div class="market-empty">Land unavailable</div>';
+      return;
+    }
+    const next = st.nextPrice;
+    let html = `<div class="land-header">
+      ${this._landMinimap(st.regions, null, true)}
+      <div class="land-summary">
+        <div class="market-card-name">Map Expansions — ${st.owned} / ${st.total} owned</div>
+        <div class="market-card-desc">Each expansion is a new 1000×1000 region, the same size as your home land.
+          Price depends on how many you've bought. Expansions must border land you own.</div>
+        <div class="land-next">${next == null ? 'All land owned!' : `Next expansion: <b>${next === 0 ? 'FREE' : next.toLocaleString() + ' 🪙'}</b>`}</div>
+        <div class="land-ladder">${st.prices.map((p, i) => `<span class="${i < st.owned ? 'done' : i === st.owned ? 'cur' : ''}">#${i + 1}: ${p === 0 ? 'Free' : p.toLocaleString()}</span>`).join('')}</div>
+        <div class="land-legend"><i class="owned"></i>Owned <i class="available"></i>Available <i class="locked"></i>Locked</div>
+        ${st.creative && next != null ? '<button class="ui-btn" id="land-unlock-all">Unlock all (Creative)</button>' : ''}
+      </div>
+    </div><div class="market-grid">`;
+    for (const r of st.regions) {
+      if (r.id === 'C') continue;
+      const price = r.status === 'owned' ? 'Owned' : next === 0 ? 'FREE' : `${next.toLocaleString()} 🪙`;
+      const btn = r.status === 'owned'
+        ? '<button class="ui-btn market-buy" disabled>Owned</button>'
+        : r.status === 'locked'
+          ? '<button class="ui-btn market-buy" disabled>Locked</button>'
+          : `<button class="ui-btn market-buy land-buy" data-region="${r.id}">Buy</button>`;
+      html += `<div class="market-card land-card ${r.status}" data-region="${r.id}">
+        ${this._landMinimap(st.regions, r.id)}
+        <div class="market-card-name">${r.name} expansion</div>
+        <div class="market-card-desc">${r.status === 'owned' ? 'Yours — build and roam here.' : r.status === 'locked' ? '🔒 ' + r.reason : 'Borders your land. 1000×1000.'}</div>
+        <div class="market-card-footer"><span class="market-price">${price}</span>${btn}</div>
+      </div>`;
+    }
+    this.marketBody.innerHTML = html + '</div>';
+    this.marketBody.querySelectorAll('.land-buy').forEach((b) => {
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = b.dataset.region;
+        const r = st.regions.find((x) => x.id === id);
+        const res = this.onPurchase?.({ id: `land-${id}`, name: `${r.name} expansion`, price: next, grant: { kind: 'land', key: id } });
+        this.toast(res?.message || 'Cannot buy', res?.ok ? 3200 : 2500, !!res?.ok);
+        if (res?.ok && res.coins != null) this.updateCoins(res.coins);
+        this._renderLandBody();
+      });
+    });
+    this.marketBody.querySelector('#land-unlock-all')?.addEventListener('click', () => {
+      const n = this.onUnlockAllLand?.() || 0;
+      this.toast(n ? `Creative: unlocked ${n} expansions` : 'All land already owned', 2500, !!n);
+      this._renderLandBody();
+    });
+  }
+
   _renderMarketBody() {
     const cat = this.marketplaceTab;
+    if (cat === 'land') {
+      this._renderLandBody();
+      return;
+    }
     const listings = MARKETPLACE_CATALOG[cat] || [];
     const real = listings.filter((l) => !l.comingSoon);
     const stubs = listings.filter((l) => l.comingSoon);

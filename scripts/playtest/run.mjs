@@ -10,7 +10,7 @@ const ROOT = path.resolve(__dirname, '../..');
 const OUT = path.join(ROOT, 'screenshots/playtest');
 fs.mkdirSync(OUT, { recursive: true });
 
-const [base, label = 'run', phaseArg = 'movement,collision,workers,dragons,core,ui'] = process.argv.slice(2);
+const [base, label = 'run', phaseArg = 'movement,collision,workers,dragons,core,ui,land'] = process.argv.slice(2);
 const phases = new Set(phaseArg.split(','));
 const VIDEO = process.argv.includes('--video');
 const R = new Results(label, base);
@@ -51,7 +51,7 @@ await phase('collision', async () => {
   await boot(page, url('?demo=1'), R, { clear: true });
   await collisionPhase(page, R, shot);
 });
-for (const name of ['workers', 'dragons', 'core', 'ui']) {
+for (const name of ['workers', 'dragons', 'core', 'ui', 'land']) {
   await phase(name, async () => {
     mods[name] = mods[name] || (await import(`./${name}.mjs`));
     await mods[name].run(page, R, shot, { url, boot: (q, opts) => boot(page, url(q), R, opts), context });

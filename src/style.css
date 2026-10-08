@@ -624,3 +624,23 @@ button.ui-btn.active { outline: 2px solid #9fe070; }
 
 /* Marketplace overlaps the help card on ~1280px screens */
 #ui-root.market-open .help-panel { visibility: hidden; }
+
+/* ---- Map expansions (market Land tab) ---- */
+.land-header { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px; }
+.land-summary { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.land-next { font-size: 13px; color: #ffe082; }
+.land-ladder { display: flex; flex-wrap: wrap; gap: 4px; font-size: 10.5px; }
+.land-ladder span { padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.06); color: #a8b898; }
+.land-ladder span.done { text-decoration: line-through; opacity: 0.55; }
+.land-ladder span.cur { background: rgba(255,213,74,0.25); color: #ffe082; font-weight: 700; }
+.land-legend { font-size: 11px; color: #c8d8b8; display: flex; gap: 6px; align-items: center; }
+.land-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-left: 6px; }
+.land-map { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; width: 54px; height: 54px; }
+.land-map.big { width: 108px; height: 108px; gap: 3px; flex-shrink: 0; }
+.land-cell { border-radius: 3px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: rgba(0,0,0,0.65); }
+.land-cell.owned, .land-legend i.owned { background: #6abf4b; }
+.land-cell.available, .land-legend i.available { background: #ffd54a; }
+.land-cell.locked, .land-legend i.locked { background: #4a4f4a; color: rgba(255,255,255,0.5); }
+.land-cell.focus { outline: 2px solid #fff; outline-offset: 1px; }
+.land-card.locked { opacity: 0.6; }
+.land-card.owned .market-price { color: #8fd474; }

@@ -68,6 +68,13 @@ export function tryPurchase(listing, ctx = {}) {
     };
   }
 
+  if (grant.kind === 'land') {
+    // Price comes from the land manager (depends on how many expansions are owned)
+    const res = ctx.onBuyLand?.(grant.key, { coins, creative });
+    if (!res?.ok) return { ok: false, message: res?.message || 'Cannot buy this land' };
+    return { ok: true, message: res.message, coins: res.coins, inventory: inv };
+  }
+
   return { ok: false, message: 'Not for sale yet' };
 }
 

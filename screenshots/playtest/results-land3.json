@@ -1,0 +1,1068 @@
+{
+  "label": "land3",
+  "base": "http://127.0.0.1:5173/dragon-ranch/",
+  "tests": [
+    {
+      "group": "input",
+      "name": "mouse events reach the 3D canvas (grid of points over the play area)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "topElementAtCentre": "canvas#game-canvas.",
+        "pointsOnCanvas": 40,
+        "pointsTested": 40,
+        "blockers": {}
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key w @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.1,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.019,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key a @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 2.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 2.84,
+        "facingErrDeg": 0,
+        "legAmp": 0.52,
+        "frames": 5,
+        "legAfterStop": 0.135,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key s @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.003,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key d @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.47,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 10,
+        "legAfterStop": 0.019,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowUp @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.2,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.009,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowLeft @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.5,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.014,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowDown @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.31,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 10,
+        "legAfterStop": 0.017,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowRight @yaw0: direction/speed/facing",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.11,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.004,
+        "yaw": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "diagonal w+d speed ratio vs straight",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6.44,
+        "dirErrDeg": 3.8,
+        "speedPerGameSec": 12,
+        "realSpeed": 5.9,
+        "facingErrDeg": 45,
+        "legAmp": 0.55,
+        "frames": 12,
+        "legAfterStop": 0.015,
+        "yaw": 0,
+        "ratio": 1
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "diagonal s+a speed ratio vs straight",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6.44,
+        "dirErrDeg": 3.8,
+        "speedPerGameSec": 12,
+        "realSpeed": 5.93,
+        "facingErrDeg": 45,
+        "legAmp": 0.54,
+        "frames": 12,
+        "legAfterStop": 0.011,
+        "yaw": 0,
+        "ratio": 1
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "diagonal ArrowUp+ArrowLeft speed ratio vs straight",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 6.44,
+        "dirErrDeg": 3.8,
+        "speedPerGameSec": 12,
+        "realSpeed": 5.97,
+        "facingErrDeg": 45,
+        "legAmp": 0.55,
+        "frames": 12,
+        "legAfterStop": 0.006,
+        "yaw": 0,
+        "ratio": 1
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "Q hold rotates camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "yawDelta": 0.72,
+        "note": "expected 1.8 rad/game-s; game dt clamps at 50ms so slower at <20fps"
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key w after Q rotation follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.3,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.016,
+        "yaw": 0.72
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key d after Q rotation follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.49,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 10,
+        "legAfterStop": 0.015,
+        "yaw": 0.72
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "E hold rotates camera (opposite of Q)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "yawDelta": -0.72
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "right-drag rotates camera yaw (and pitch)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "yaw": -1.25,
+        "pitch": 0.4999999999999998,
+        "expectYaw": -1.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key w after right-drag follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 5.4,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 6.24,
+        "facingErrDeg": 0,
+        "legAmp": 0.54,
+        "frames": 10,
+        "legAfterStop": 0.015,
+        "yaw": -1.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "key ArrowLeft after right-drag follows camera",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 4.2,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 12,
+        "realSpeed": 4.97,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 8,
+        "legAfterStop": 0.017,
+        "yaw": -1.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "pitch clamped to [0.25, 1.35]",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pMax": 1.35,
+        "pMin": 0.25
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "sprint (Shift) — exists?",
+      "pass": null,
+      "severity": "medium",
+      "details": {
+        "speedWithShift": 12,
+        "normal": 12,
+        "note": "No sprint mechanic in game (Shift has no effect)"
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "low energy (<25) slows to 0.55x",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "dist": 2.64,
+        "dirErrDeg": 0,
+        "speedPerGameSec": 6.6,
+        "realSpeed": 3.24,
+        "facingErrDeg": 0,
+        "legAmp": 0.55,
+        "frames": 9,
+        "legAfterStop": 0.009,
+        "yaw": 0,
+        "ratio": 0.55
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "energy drains ~2.5/s while moving",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "drained": 2.75
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "walk animation plays while moving & settles when stopped",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "legAmp": 0.55,
+        "legAfterStop": 0
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "camera follow smooth (steady speed CV, no direction jitter, settles)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "camSpeedMean": 12,
+        "camSpeedCV": 0,
+        "maxDirDeviationDeg": 0,
+        "settleStepMax": 0.0008,
+        "frames": 11
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "zoom clamps at [6, 40]",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "start": 16,
+        "zMax": 40,
+        "zMin": 6,
+        "notchesFromDefaultToMax": 10,
+        "unitsPerNotch": 0.4
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound +X edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": 498.5,
+          "z": 0
+        },
+        "limit": 498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound -X edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": -498.5,
+          "z": 0
+        },
+        "limit": -498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound +Z edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": 0,
+          "z": 498.5
+        },
+        "limit": 498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "world bound -Z edge clamps at ±498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "pos": {
+          "x": 0,
+          "z": -498.5
+        },
+        "limit": -498.5
+      }
+    },
+    {
+      "group": "player-movement",
+      "name": "corner clamp + slides along edge + not stuck",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "corner": {
+          "x": 498.5,
+          "z": 498.5
+        },
+        "afterSlide": {
+          "x": 498.5,
+          "z": 493.9058874503046
+        }
+      }
+    },
+    {
+      "group": "land",
+      "name": "new game owns only the home region; 8 unowned regions are fogged",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "owned": [
+          "C"
+        ],
+        "coins": 200,
+        "next": 0,
+        "overlays": 8,
+        "p": {
+          "x": 2,
+          "z": 8
+        }
+      }
+    },
+    {
+      "group": "land",
+      "name": "config price table = [0,1000,10000,20000,...,60000] for 8 expansions",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "prices": [
+          0,
+          1000,
+          10000,
+          20000,
+          30000,
+          40000,
+          50000,
+          60000
+        ],
+        "total": 8
+      }
+    },
+    {
+      "group": "land",
+      "name": "Land tab lists 8 expansions: N/E/S/W available, corners locked with a reason",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "cards": [
+          {
+            "id": "NW",
+            "cls": "market-card land-card locked",
+            "price": "FREE",
+            "desc": "🔒 Buy North or West first",
+            "btn": "Locked",
+            "disabled": true
+          },
+          {
+            "id": "N",
+            "cls": "market-card land-card available",
+            "price": "FREE",
+            "desc": "Borders your land. 1000×1000.",
+            "btn": "Buy",
+            "disabled": false
+          },
+          {
+            "id": "NE",
+            "cls": "market-card land-card locked",
+            "price": "FREE",
+            "desc": "🔒 Buy North or East first",
+            "btn": "Locked",
+            "disabled": true
+          },
+          {
+            "id": "W",
+            "cls": "market-card land-card available",
+            "price": "FREE",
+            "desc": "Borders your land. 1000×1000.",
+            "btn": "Buy",
+            "disabled": false
+          },
+          {
+            "id": "E",
+            "cls": "market-card land-card available",
+            "price": "FREE",
+            "desc": "Borders your land. 1000×1000.",
+            "btn": "Buy",
+            "disabled": false
+          },
+          {
+            "id": "SW",
+            "cls": "market-card land-card locked",
+            "price": "FREE",
+            "desc": "🔒 Buy South or West first",
+            "btn": "Locked",
+            "disabled": true
+          },
+          {
+            "id": "S",
+            "cls": "market-card land-card available",
+            "price": "FREE",
+            "desc": "Borders your land. 1000×1000.",
+            "btn": "Buy",
+            "disabled": false
+          },
+          {
+            "id": "SE",
+            "cls": "market-card land-card locked",
+            "price": "FREE",
+            "desc": "🔒 Buy South or East first",
+            "btn": "Locked",
+            "disabled": true
+          }
+        ]
+      }
+    },
+    {
+      "group": "land",
+      "name": "header shows next expansion FREE + 3x3 minimap",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "header": "Next expansion: FREE"
+      }
+    },
+    {
+      "group": "land",
+      "name": "1st expansion (North) is free — bought with 0 coins",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "id": "N",
+        "before": 0,
+        "after": 0,
+        "paid": 0,
+        "owned": true,
+        "toast": "North expansion unlocked — free!"
+      }
+    },
+    {
+      "group": "land",
+      "name": "purchase toast + reveal fade",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "toast": "North expansion unlocked — free!",
+        "fading": 1
+      }
+    },
+    {
+      "group": "land",
+      "name": "after N: price shows 1,000 and NE/NW become available",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "cards": [
+          [
+            "NW",
+            "available",
+            "1,000 🪙"
+          ],
+          [
+            "N",
+            "owned",
+            "Owned"
+          ],
+          [
+            "NE",
+            "available",
+            "1,000 🪙"
+          ],
+          [
+            "W",
+            "available",
+            "1,000 🪙"
+          ],
+          [
+            "E",
+            "available",
+            "1,000 🪙"
+          ],
+          [
+            "SW",
+            "locked",
+            "1,000 🪙"
+          ],
+          [
+            "S",
+            "available",
+            "1,000 🪙"
+          ],
+          [
+            "SE",
+            "locked",
+            "1,000 🪙"
+          ]
+        ]
+      }
+    },
+    {
+      "group": "land",
+      "name": "2nd expansion refused with 999 coins",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "id": "E",
+        "before": 999,
+        "after": 999,
+        "paid": 0,
+        "owned": false,
+        "toast": "Need 1000 coins (have 999)"
+      }
+    },
+    {
+      "group": "land",
+      "name": "2nd expansion (East) costs 1000",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "id": "E",
+        "before": 1000,
+        "after": 0,
+        "paid": 1000,
+        "owned": true,
+        "toast": "East expansion unlocked for 1,000 coins"
+      }
+    },
+    {
+      "group": "land",
+      "name": "owned = C,E,N; 6 overlays left",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "owned": [
+          "C",
+          "E",
+          "N"
+        ],
+        "coins": 0,
+        "next": 10000,
+        "overlays": 6,
+        "p": {
+          "x": 2,
+          "z": 8
+        }
+      }
+    },
+    {
+      "group": "land",
+      "name": "walk north from home into owned North expansion",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "x": 0,
+        "z": -508.4
+      }
+    },
+    {
+      "group": "land",
+      "name": "walk east into owned East expansion",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "x": 508.4,
+        "z": 0
+      }
+    },
+    {
+      "group": "land",
+      "name": "blocked at unowned West edge (stops flush at -498.5)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "x": -498.5,
+        "z": 0
+      }
+    },
+    {
+      "group": "land",
+      "name": "blocked at unowned South edge (stops flush at 498.5)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "x": 0,
+        "z": 498.5
+      }
+    },
+    {
+      "group": "land",
+      "name": "L-shape: from North, cannot walk east into unowned NE",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "x": 498.5,
+        "z": -600
+      }
+    },
+    {
+      "group": "land",
+      "name": "L-shape: from East, cannot walk north into unowned NE",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "x": 600,
+        "z": -498.5
+      }
+    },
+    {
+      "group": "land",
+      "name": "L-shape inner corner: diagonal walk never enters NE",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "x": 498.5,
+        "z": -504.958
+      }
+    },
+    {
+      "group": "land",
+      "name": "canOccupy: N/E true, NE/W false",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "NE": false,
+        "N": true,
+        "E": true,
+        "W": false
+      }
+    },
+    {
+      "group": "land",
+      "name": "map edge in East expansion stops at 1498.5",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "x": 1498.5,
+        "z": 0
+      }
+    },
+    {
+      "group": "land",
+      "name": "farmhouse placed inside North expansion",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": true,
+        "prompt": "Click / F to place Farmhouse",
+        "id": 1,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": -543,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "land",
+      "name": "placement blocked on unowned West land, with land prompt",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ok": false,
+        "prompt": "Land not owned — buy a Map Expansion (Market → Map Expansions)",
+        "id": 1,
+        "type": "farmhouse",
+        "tx": -3,
+        "tz": -543,
+        "w": 6,
+        "d": 6,
+        "rotation": 0
+      }
+    },
+    {
+      "group": "land",
+      "name": "canPlace: across owned N edge ok; across W edge / in NE blocked",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "straddleW": false,
+        "straddleN": true,
+        "NE": false,
+        "E": true
+      }
+    },
+    {
+      "group": "land",
+      "name": "reload: owned expansions, player in expansion, and building persist",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "owned": [
+          "C",
+          "E",
+          "N"
+        ],
+        "coins": 0,
+        "next": 10000,
+        "overlays": 6,
+        "p": {
+          "x": 0,
+          "z": -560
+        },
+        "buildingsInN": 1
+      }
+    },
+    {
+      "group": "land",
+      "name": "old save without land data migrates to home region only",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "owned": [
+          "C"
+        ],
+        "coins": 0,
+        "next": 0,
+        "overlays": 8,
+        "p": {
+          "x": 0,
+          "z": 0
+        }
+      }
+    },
+    {
+      "group": "land",
+      "name": "prices for expansions 1..8 = 0,1000,10000,20000,30000,40000,50000,60000 (shown + charged)",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "ladder": [
+          {
+            "id": "N",
+            "shown": "FREE",
+            "paid": 0,
+            "owned": true
+          },
+          {
+            "id": "E",
+            "shown": "1,000 🪙",
+            "paid": 1000,
+            "owned": true
+          },
+          {
+            "id": "S",
+            "shown": "10,000 🪙",
+            "paid": 10000,
+            "owned": true
+          },
+          {
+            "id": "W",
+            "shown": "20,000 🪙",
+            "paid": 20000,
+            "owned": true
+          },
+          {
+            "id": "NE",
+            "shown": "30,000 🪙",
+            "paid": 30000,
+            "owned": true
+          },
+          {
+            "id": "SE",
+            "shown": "40,000 🪙",
+            "paid": 40000,
+            "owned": true
+          },
+          {
+            "id": "SW",
+            "shown": "50,000 🪙",
+            "paid": 50000,
+            "owned": true
+          },
+          {
+            "id": "NW",
+            "shown": "60,000 🪙",
+            "paid": 60000,
+            "owned": true
+          }
+        ]
+      }
+    },
+    {
+      "group": "land",
+      "name": "all 8 owned: no overlays, header says all owned",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "owned": [
+          "C",
+          "E",
+          "N",
+          "NE",
+          "NW",
+          "S",
+          "SE",
+          "SW",
+          "W"
+        ],
+        "coins": 789000,
+        "next": null,
+        "overlays": 0,
+        "p": {
+          "x": 2,
+          "z": 8
+        },
+        "allHdr": "All land owned!"
+      }
+    },
+    {
+      "group": "land",
+      "name": "Creative: \"Unlock all\" owns all 9 regions",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "owned": [
+          "C",
+          "E",
+          "N",
+          "NE",
+          "NW",
+          "S",
+          "SE",
+          "SW",
+          "W"
+        ],
+        "coins": 99999,
+        "next": null,
+        "overlays": 0,
+        "p": {
+          "x": 2,
+          "z": 8
+        }
+      }
+    },
+    {
+      "group": "land",
+      "name": "can roam in NW corner region after unlock all",
+      "pass": true,
+      "severity": null,
+      "details": {
+        "x": -1007.212,
+        "z": -1008.412
+      }
+    }
+  ],
+  "console": [
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x14001a6600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x14001a6600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x14001ab400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    }
+  ],
+  "metrics": {
+    "fps": {
+      "idleSpawn": {
+        "frames": 30,
+        "fps": 7.6,
+        "avgFrameMs": 131.9,
+        "p95FrameMs": 152.9,
+        "maxFrameMs": 229,
+        "avgRenderMs": 3.6,
+        "drawCalls": 484,
+        "triangles": 22310,
+        "sceneObjects": 430
+      },
+      "worldCorner": {
+        "frames": 31,
+        "fps": 10.5,
+        "avgFrameMs": 95.6,
+        "p95FrameMs": 99.8,
+        "maxFrameMs": 101,
+        "avgRenderMs": 1,
+        "drawCalls": 29,
+        "triangles": 9102,
+        "sceneObjects": 499
+      },
+      "walking": {
+        "frames": 51,
+        "fps": 10.2,
+        "avgFrameMs": 98,
+        "p95FrameMs": 117.5,
+        "maxFrameMs": 121.6,
+        "avgRenderMs": 1.2,
+        "drawCalls": 35,
+        "triangles": 9134,
+        "sceneObjects": 499,
+        "walkedToX": -417.6
+      }
+    },
+    "consoleCount": 3
+  },
+  "_canvasChecked": true
+}
